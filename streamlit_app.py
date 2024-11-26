@@ -210,7 +210,7 @@ st.title("Dynamic PDF Viewer from GitHub")
 k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
 
 # GitHub repository raw URL (adjust this to your repo)
-github_repo_url = "https://github.com/espositomario/CardioDiff-VAE-App/tree/main/data/plots/TSSplots"
+github_repo_url = "https://github.com/espositomario/CardioDiff-VAE-App/blob/main/data/plots/TSSplots"
 
 # Generate the raw file URL based on user input
 pdf_file_url = f"{github_repo_url}/C{k}_ext.pdf"

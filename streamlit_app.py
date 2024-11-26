@@ -2,19 +2,10 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import pickle
+import os
 from plotly.graph_objects import Figure, Violin
 import plotly.graph_objects as go
-
-# Load data
-CODINGS_SIZE = 6
-INPUT_GENES = 'ALL'
-INPUT_FEATURES = 'X_FC'
-INPUT_NORM = 'z'
-METHOD = 'VAE'
-k = 80
-LABELS_COL = f'GMM_{METHOD}_{k}'
-ID = f'{CODINGS_SIZE}D_{INPUT_GENES}_{INPUT_FEATURES}_{INPUT_NORM}'
-DIR_DATA = f'./data/{ID}_analysis/{LABELS_COL}/'
+from streamlit_pdf_viewer import pdf_viewer
 
 # Load gene cluster dictionary
 with open(f'./gene_clusters_dict.pkl', 'rb') as f:
@@ -22,7 +13,6 @@ with open(f'./gene_clusters_dict.pkl', 'rb') as f:
 
 # Load CODE and LOG matrices
 CODE = pd.read_csv(f'./CODE.csv', index_col='GENE')
-LOG = pd.read_csv(f'./ALL_X_FC.csv').set_index('GENE')
 
 # Map cluster IDs to CODE and LOG
 gene_to_cluster = {}
@@ -30,8 +20,7 @@ for cluster_id, gene_list in GENE_CLUSTERS.items():
     for gene in gene_list['gene_list']:
         gene_to_cluster[gene] = cluster_id
 
-LOG[LABELS_COL] = LOG.index.map(gene_to_cluster).astype(int)
-CODE[LABELS_COL] = LOG.index.map(gene_to_cluster).astype(int)
+CODE["GMM_VAE_80"] = CODE.index.map(gene_to_cluster).astype(int)
 
 # List of continuous features for coloring
 continuous_features = ["RNA_CV", "VAE_RMSE", "VAE_Sc"]
@@ -39,184 +28,131 @@ continuous_features = ["RNA_CV", "VAE_RMSE", "VAE_Sc"]
 # Streamlit app layout
 st.set_page_config(layout="wide")
 
-st.title("Gene Visualization in VAE 6D Latent Space")
+# Add a sidebar to select the page
+page = st.sidebar.radio("Select Page", ["UMAP & Distribution", "Cluster TSS & ORA"])
 
-# Dropdown for feature selection
-selected_feature = st.selectbox(
-    "Select Continuous Feature to Color By",
-    options=continuous_features,
-    index=0  # Default to the first feature
-)
+if page == "UMAP & Distribution":
+    st.title("Gene Visualization in VAE 6D Latent Space")
 
-# Filter data using color scale
-color_min, color_max = st.slider(
-    f"Filter genes (points) by {selected_feature}",
-    min_value=float(CODE[selected_feature].min()),
-    max_value=float(CODE[selected_feature].max()),
-    value=(float(CODE[selected_feature].min()), float(CODE[selected_feature].max())),
-    step=0.01
-)
-filtered_data = CODE[(CODE[selected_feature] >= color_min) & (CODE[selected_feature] <= color_max)]
+    # Dropdown for feature selection
+    selected_feature = st.selectbox(
+        "Select Continuous Feature to Color By",
+        options=continuous_features,
+        index=0  # Default to the first feature
+    )
 
-# Calculate the number of selected genes
-num_selected_genes = filtered_data.shape[0]
-total_genes = CODE.shape[0]
-scatter_title = f"({num_selected_genes}/{total_genes} genes selected)"
+    # Filter data using color scale
+    color_min, color_max = st.slider(
+        f"Filter genes (points) by {selected_feature}",
+        min_value=float(CODE[selected_feature].min()),
+        max_value=float(CODE[selected_feature].max()),
+        value=(float(CODE[selected_feature].min()), float(CODE[selected_feature].max())),
+        step=0.01
+    )
+    filtered_data = CODE[(CODE[selected_feature] >= color_min) & (CODE[selected_feature] <= color_max)]
 
-# Layout for scatter plot and violin plot
-col1, col2 = st.columns(2)
+    # Calculate the number of selected genes
+    num_selected_genes = filtered_data.shape[0]
+    total_genes = CODE.shape[0]
+    scatter_title = f"({num_selected_genes}/{total_genes} genes selected)"
 
-# UMAP Scatter plot settings
-with col1:
-    st.header("UMAP 2D projection")
-    # Compact settings dropdown
-    with st.expander("⚙️", expanded=False):
-        st.markdown(
-            """
-            <style>
-            .streamlit-expanderHeader {
-                font-size: 12px !important;
-                padding: 5px 5px !important;
-            }
-            </style>
-            """, unsafe_allow_html=True
+    # Layout for scatter plot and violin plot
+    col1, col2 = st.columns(2)
+
+    # UMAP Scatter plot settings
+    with col1:
+        st.markdown("<h3 style='text-align: center;'>UMAP 2D Projection</h3>", unsafe_allow_html=True)
+        with st.expander("⚙️", expanded=False):
+            point_size = st.slider("Point Size", min_value=1, max_value=6, value=3, step=1)
+            colormap = st.selectbox("Select Colormap", ["Spectral_r", "viridis", "plasma", "cividis", "rainbow", "magma"], index=0)
+
+        # Create scatter plot
+        fig = px.scatter(
+            filtered_data,
+            x="UMAP1",
+            y="UMAP2",
+            color=selected_feature,
+            hover_data=["UMAP1", "UMAP2", selected_feature],
+            title=scatter_title,
+            labels={"UMAP1": "UMAP 1", "UMAP2": "UMAP 2"},
+            color_continuous_scale=colormap
         )
-        point_size = st.slider("Point Size", min_value=1, max_value=6, value=3, step=1)
-        colormap = st.selectbox("Select Colormap", ["Spectral_r", "viridis", "plasma", "cividis", "rainbow", "magma"], index=0)
-
-    # Create scatter plot
-    fig = px.scatter(
-        filtered_data,
-        x="UMAP1",
-        y="UMAP2",
-        color=selected_feature,
-        hover_data=["UMAP1", "UMAP2", selected_feature],
-        title=scatter_title,
-        labels={"UMAP1": "UMAP 1", "UMAP2": "UMAP 2"},
-        color_continuous_scale=colormap
-    )
-
-    # Adjust plot appearance
-    fig.update_traces(marker=dict(size=point_size))  # Adjust point size
-    fig.update_layout(
- 
-        xaxis_showgrid=False,  # No gridlines
-        yaxis_showgrid=False,
-        xaxis_tickvals=[],  # Hide tick labels
-        yaxis_tickvals=[],
-        plot_bgcolor="white",
-        autosize=True,
-        width=300,  # Fixed width
-        height=500  # Fixed height for a square layout
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-#Violin plot settings
-with col2:
-    st.header(f"{selected_feature} distribution for all genes")
-    
-    # Add violin plot with box
-    box_violin_fig = go.Figure()
-
-    # Add violin trace
-    box_violin_fig.add_trace(
-        go.Violin(
-            y=CODE[selected_feature],
-            box=dict(visible=True),  # Show boxplot
-            meanline=dict(visible=True),  # Show mean line
-            line_color="gray",
-            fillcolor="lightgray",
-            opacity=1
+        fig.update_traces(marker=dict(size=point_size))
+        fig.update_layout(
+            xaxis_showgrid=False, yaxis_showgrid=False,
+            xaxis_tickvals=[], yaxis_tickvals=[],
+            plot_bgcolor="white", autosize=True
         )
-    )
+        st.plotly_chart(fig, use_container_width=True)
 
-    # Add a transparent red rectangle for the filter range
-    box_violin_fig.add_shape(
-        type="rect",
-        xref="paper",  # Use full width of the plot
-        yref="y",
-        x0=0, x1=1,  # Rectangle spans the entire x-axis
-        y0=color_min, y1=color_max,  # Rectangle spans the selected range
-        fillcolor="blue",
-        opacity=0.10,  # Make it transparent
-        line=dict(width=0)  # No border
-    )
+    # Violin plot settings
+    with col2:
+        st.markdown(f"<h3 style='text-align: center;'>{selected_feature} Distribution for All Genes</h3>", unsafe_allow_html=True)
+        box_violin_fig = go.Figure()
+        box_violin_fig.add_trace(
+            go.Violin(
+                y=CODE[selected_feature],
+                box=dict(visible=True),
+                meanline=dict(visible=True),
+                line_color="gray",
+                fillcolor="lightgray",
+                opacity=1
+            )
+        )
+        box_violin_fig.add_shape(
+            type="rect", xref="paper", yref="y", x0=0, x1=1, y0=color_min, y1=color_max,
+            fillcolor="blue", opacity=0.10, line=dict(width=0)
+        )
+        box_violin_fig.update_layout(
+            yaxis_title=selected_feature,
+            xaxis=dict(showticklabels=False),
+            plot_bgcolor="white", showlegend=False,
+            autosize=True
+        )
+        st.plotly_chart(box_violin_fig, use_container_width=False)
 
-    # Adjust plot appearance
-    box_violin_fig.update_layout(
-        title="",
-        yaxis_title=selected_feature,
-        xaxis=dict(showticklabels=False),  # Hide x-axis ticks
-        plot_bgcolor="white",
-        showlegend=False
-    )
+elif page == "Cluster TSS & ORA":
+    st.title("Cluster TSS and Term Enrichment")
+
+    # Input field for selecting k (from 0 to 79)
+    k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
     
-    box_violin_fig.update_layout(
- 
-        xaxis_showgrid=False,  # No gridlines
-        yaxis_showgrid=True,
 
-        plot_bgcolor="white",
-        autosize=True,
-        width=300,  # Fixed width
-        height=600  # Fixed height for a square layout
-    )
+    # Define file paths
+    tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
+    ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
 
-    st.plotly_chart(box_violin_fig, use_container_width=False)
-    
-    
-    
-    
-    
-import os
+    # Create two columns for layout
+    col1, col2 = st.columns(2)
 
-## Title
-#st.title("Dynamic PDF Viewer")
-#
-## Input field for selecting k (from 0 to 79)
-#k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
-#
-## Generate the file path based on the input
-#pdf_file_path = f"./data/plots/TSSplots/C{k}_ext.pdf"
-#
-#
-#
-#
-## Check if the file exists
-#if os.path.exists(pdf_file_path):
-#    st.write(f"Displaying: `C{k}_ext.pdf`")
-#
-#    # Embed the PDF in an iframe
-#    pdf_display = f"""
-#    <iframe src="file://{os.path.abspath(pdf_file_path)}" width="700" height="1000" style="border: none;"></iframe>
-#    """
-#    st.markdown(pdf_display, unsafe_allow_html=True)
-#    
-#    # Add a download button
-#    with open(pdf_file_path, "rb") as pdf_file:
-#        st.download_button(label=f"Download `C{k}_ext.pdf`", data=pdf_file, file_name=f"C{k}_ext.pdf")
-#else:
-#    st.error(f"File `C{k}_ext.pdf` not found in `./data/TSSplots/`")
-#
-#
-#
-#
-#
+    # Left column: TSS plot
+    with col1:
+        st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True)
+        pdf_viewer(tss_plot_pdf_file)
+        try:
+            with open(tss_plot_pdf_file, "rb") as pdf_file:
+                tss_data = pdf_file.read()
+            st.download_button(
+                label="Download",
+                data=tss_data,
+                file_name=f"C{k}_TSSPlot.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("TSS plot file not found.")
 
-# Title
-st.title("Dynamic PDF Viewer from GitHub")
-
-# Input field for selecting k (from 0 to 79)
-k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
-
-# GitHub repository raw URL (adjust this to your repo)
-github_repo_url = "https://github.com/espositomario/CardioDiff-VAE-App/blob/main/data/plots/TSSplots"
-
-# Generate the raw file URL based on user input
-pdf_file_url = f"{github_repo_url}/C{k}_ext.pdf"
-
-# Embed the PDF in an iframe using Streamlit's HTML component
-pdf_display = f"""
-    <iframe src="{pdf_file_url}" width="700" height="1000" style="border: none;"></iframe>
-"""
-st.components.v1.html(pdf_display, height=1000)
+    # Right column: ORA plot
+    with col2:
+        st.markdown("<h3 style='text-align: center;'>Term Enrichment</h3>", unsafe_allow_html=True)
+        if os.path.exists(ora_plot_pdf):
+            pdf_viewer(ora_plot_pdf)
+            with open(ora_plot_pdf, "rb") as pdf_file:
+                ora_data = pdf_file.read()
+            st.download_button(
+                label="Download",
+                data=ora_data,
+                file_name=f"C{k}_TermEnrichment.pdf",
+                mime="application/pdf",
+            )
+        else:
+            st.write("No significant term resulted.")

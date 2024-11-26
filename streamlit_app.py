@@ -168,7 +168,7 @@ with col2:
     
     
     
-    import os
+import os
 
 # Title
 st.title("Dynamic PDF Viewer")
@@ -198,3 +198,25 @@ if os.path.exists(pdf_file_path):
 else:
     st.error(f"File `C{k}_ext.pdf` not found in `./data/TSSplots/`")
 
+
+
+
+#
+
+# Title
+st.title("Dynamic PDF Viewer from GitHub")
+
+# Input field for selecting k (from 0 to 79)
+k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
+
+# GitHub repository raw URL (adjust this to your repo)
+github_repo_url = "https://github.com/espositomario/CardioDiff-VAE-App/tree/main/data/plots/TSSplots"
+
+# Generate the raw file URL based on user input
+pdf_file_url = f"{github_repo_url}/C{k}_ext.pdf"
+
+# Embed the PDF in an iframe using Streamlit's HTML component
+pdf_display = f"""
+    <iframe src="{pdf_file_url}" width="700" height="1000" style="border: none;"></iframe>
+"""
+st.components.v1.html(pdf_display, height=1000)

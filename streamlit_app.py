@@ -170,37 +170,37 @@ with col2:
     
 import os
 
-# Title
-st.title("Dynamic PDF Viewer")
-
-# Input field for selecting k (from 0 to 79)
-k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
-
-# Generate the file path based on the input
-pdf_file_path = f"./data/plots/TSSplots/C{k}_ext.pdf"
-
-
-
-
-# Check if the file exists
-if os.path.exists(pdf_file_path):
-    st.write(f"Displaying: `C{k}_ext.pdf`")
-
-    # Embed the PDF in an iframe
-    pdf_display = f"""
-    <iframe src="file://{os.path.abspath(pdf_file_path)}" width="700" height="1000" style="border: none;"></iframe>
-    """
-    st.markdown(pdf_display, unsafe_allow_html=True)
-    
-    # Add a download button
-    with open(pdf_file_path, "rb") as pdf_file:
-        st.download_button(label=f"Download `C{k}_ext.pdf`", data=pdf_file, file_name=f"C{k}_ext.pdf")
-else:
-    st.error(f"File `C{k}_ext.pdf` not found in `./data/TSSplots/`")
-
-
-
-
+## Title
+#st.title("Dynamic PDF Viewer")
+#
+## Input field for selecting k (from 0 to 79)
+#k = st.number_input("Enter a number (k) between 0 and 79:", min_value=0, max_value=79, step=1, value=0)
+#
+## Generate the file path based on the input
+#pdf_file_path = f"./data/plots/TSSplots/C{k}_ext.pdf"
+#
+#
+#
+#
+## Check if the file exists
+#if os.path.exists(pdf_file_path):
+#    st.write(f"Displaying: `C{k}_ext.pdf`")
+#
+#    # Embed the PDF in an iframe
+#    pdf_display = f"""
+#    <iframe src="file://{os.path.abspath(pdf_file_path)}" width="700" height="1000" style="border: none;"></iframe>
+#    """
+#    st.markdown(pdf_display, unsafe_allow_html=True)
+#    
+#    # Add a download button
+#    with open(pdf_file_path, "rb") as pdf_file:
+#        st.download_button(label=f"Download `C{k}_ext.pdf`", data=pdf_file, file_name=f"C{k}_ext.pdf")
+#else:
+#    st.error(f"File `C{k}_ext.pdf` not found in `./data/TSSplots/`")
+#
+#
+#
+#
 #
 
 # Title

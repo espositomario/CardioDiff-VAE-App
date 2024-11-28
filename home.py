@@ -16,6 +16,8 @@ from pandas.api.types import (
 
 
 
+
+
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
     From:(https://blog.streamlit.io/auto-generate-a-dataframe-filtering-ui-in-streamlit-with-filter_dataframe/)
@@ -96,7 +98,9 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # Streamlit app layout
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
+#st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="collapsed", menu_items=None)
+
 
 
 # Load gene cluster dictionary

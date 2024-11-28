@@ -4,7 +4,7 @@ from home import *
 
 st.dataframe(filter_dataframe(DATA))
 
-with st.expander('RNA FPKM data table'):
+with st.expander('Info'):
     st.markdown("- VAE* columns are the 6D latent space coordinates of the genes.\n"
                  "- RNA_(CellType) columns are the RNA-seq FPKM values of the genes.\n"
                  "- ChIP-seq columns are the Z-scores of the ChIP-seq levels (average between replicates).\n"

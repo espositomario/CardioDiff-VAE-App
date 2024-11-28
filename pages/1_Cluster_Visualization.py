@@ -1,5 +1,6 @@
 from home import * 
 
+
 st.markdown("<h1 style='text-align: center;'>Cluster visualization</h1>", unsafe_allow_html=True)
 
 # Create two columns for layout
@@ -22,7 +23,7 @@ with CC[2]:
     file_content = "\n".join(GENE_LIST)
 
     st.download_button(
-        label="Gene IDs",
+        label="Gene List",
         icon=":material/download:",
         data=file_content,
         file_name=f"C{k}_GeneIDsList.txt",

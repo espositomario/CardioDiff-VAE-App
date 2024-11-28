@@ -2,3 +2,4 @@ streamlit
 plotly
 pandas
 streamlit-pdf-viewer
+streamlit-navigation-bar

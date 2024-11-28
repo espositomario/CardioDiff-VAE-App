@@ -99,9 +99,8 @@ with C[1]:
 
 
 with st.expander("Cluster Data Table"):
-    st.dataframe(filter_dataframe(DATA[DATA['Cluster'] == k]))
-
-
+    SEL = DATA[DATA['Cluster'] == k]
+    df_tabs(SEL)
 
 
 

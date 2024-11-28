@@ -1,13 +1,16 @@
 from home import *
 
-st.title("Gene Visualization in VAE 6D Latent Space")
+st.title("Gene encoding in VAE 6D Latent Space")
 
-# Dropdown for feature selection
-selected_feature = st.selectbox(
-    "Select Continuous Feature to Color By",
-    options=continuous_features,
-    index=0  # Default to the first feature
-)
+C = st.columns(2)
+with C[0]:
+        
+    # Dropdown for feature selection
+    selected_feature = st.selectbox(
+        "Color By",
+        options=continuous_features,
+        index=0  # Default to the first feature
+    )
 
 # Filter data using color scale
 color_min, color_max = st.slider(
@@ -41,7 +44,7 @@ with col1:
         x="VAE_UMAP1",
         y="VAE_UMAP2",
         color=selected_feature,
-        hover_data=["VAE_UMAP1", "VAE_UMAP2", selected_feature],
+        hover_data=[filtered_data.index,"Cluster", selected_feature],
         title=scatter_title,
         labels={"VAE_UMAP1": "UMAP1" , "VAE_UMAP2": "UMAP2"},
         color_continuous_scale=colormap
@@ -70,7 +73,7 @@ with col2:
     )
     box_violin_fig.add_shape(
         type="rect", xref="paper", yref="y", x0=0, x1=1, y0=color_min, y1=color_max,
-        fillcolor="blue", opacity=0.10, line=dict(width=0)
+        fillcolor="#e2e8ec", opacity=0.5, line=dict(width=0)
     )
     box_violin_fig.update_layout(
         yaxis_title=selected_feature,

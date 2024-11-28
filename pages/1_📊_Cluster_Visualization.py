@@ -9,6 +9,9 @@ with CC[1]:
     # Input field for selecting k (from 0 to 79)
     k = st.number_input(label="Select a Cluster (from 0 to 79)", label_visibility="collapsed"
                         , min_value=0, max_value=79, step=1, value=76, placeholder="Enter a number between 0 and 79")
+    
+
+    
     NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
     GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
     
@@ -26,10 +29,21 @@ with CC[2]:
         mime="text/plain"
     )
 
-with CC[3]:
-    st.markdown(f"<h5 style='text-align: left;'># of genes: {NUM_OF_GENES}</h5>", unsafe_allow_html=True)
     
-    
+with CC[4]:
+    # Add a tool to query by GENE
+    with st.popover("🔍 Cluster by Gene"):
+        st.markdown("<h3 style='text-align: center;'>Find where is a Gene</h3>", unsafe_allow_html=True)
+        gene_query = st.text_input("Enter a mouse Refseq Gene symbol (e.g., Pim1)")
+
+        if gene_query:
+            if gene_query in DATA.index:
+                k = DATA.loc[gene_query, 'Cluster']
+                st.write(f"{gene_query} is in Cluster {k}.")
+            else:
+                st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
+            
+st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
     
 C = st.columns(2)
 with C[0]:    
@@ -39,7 +53,8 @@ with C[0]:
     ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
 
 
-    st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True,
+                help="Transcription Starting Site Metaplots.\n - target histone marks on the rows\n - cell types in columns\n - dashed lines represents the control")
     pdf_viewer(tss_plot_pdf_file)
     try:
         with open(tss_plot_pdf_file, "rb") as pdf_file:
@@ -74,9 +89,18 @@ with C[1]:
         st.markdown(
         """
         <div style="text-align: center; font-size: 16px;">
-            No significant term resulted (adj. p-value < 0.05)
+            No significant term resulted (adj. p-value > 0.05)
         </div>
         """, 
         unsafe_allow_html=True
         )
+
+
+
+with st.expander("Cluster Data Table"):
+    st.dataframe(filter_dataframe(DATA[DATA['Cluster'] == k]))
+
+
+
+
 

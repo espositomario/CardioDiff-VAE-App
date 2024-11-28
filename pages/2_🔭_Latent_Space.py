@@ -29,8 +29,9 @@ col1, col2 = st.columns(2)
 
 # UMAP Scatter plot settings
 with col1:
-    st.markdown("<h3 style='text-align: center;'>UMAP 2D Projection</h3>", unsafe_allow_html=True)
-    with st.expander("⚙️", expanded=False):
+    st.markdown("<h3 style='text-align: center;'>UMAP 2D Projection</h3>", unsafe_allow_html=True,
+                help="UMAP 2D projection of VAE 6D latent space")
+    with st.popover("⚙️", ):
         point_size = st.slider("Point Size", min_value=1, max_value=6, value=3, step=1)
         colormap = st.selectbox("Select Colormap", ["Spectral_r", "viridis", "plasma", "cividis", "rainbow", "magma"], index=0)
 

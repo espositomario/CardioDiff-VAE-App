@@ -3,9 +3,9 @@ from home import *
 st.markdown("<h1 style='text-align: center;'>Cluster visualization</h1>", unsafe_allow_html=True)
 
 # Create two columns for layout
-CC = st.columns(9)
+CC = st.columns(5)
     
-with CC[3]:
+with CC[1]:
     # Input field for selecting k (from 0 to 79)
     k = st.number_input(label="Select a Cluster (from 0 to 79)", label_visibility="collapsed"
                         , min_value=0, max_value=79, step=1, value=76, placeholder="Enter a number between 0 and 79")
@@ -14,7 +14,7 @@ with CC[3]:
     
     
     
-with CC[4]:
+with CC[2]:
     # Convert the list to a string with each element on a new line
     file_content = "\n".join(GENE_LIST)
 
@@ -26,8 +26,8 @@ with CC[4]:
         mime="text/plain"
     )
 
-with CC[5]:
-    st.markdown(f"\# of genes: {NUM_OF_GENES}", unsafe_allow_html=True)
+with CC[3]:
+    st.markdown(f"<h5 style='text-align: left;'># of genes: {NUM_OF_GENES}</h5>", unsafe_allow_html=True)
     
     
     

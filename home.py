@@ -8,11 +8,11 @@ import plotly.graph_objects as go
 from streamlit_pdf_viewer import pdf_viewer
 
 # Load gene cluster dictionary
-with open(f'./gene_clusters_dict.pkl', 'rb') as f:
+with open(f'./data/gene_clusters_dict.pkl', 'rb') as f:
     GENE_CLUSTERS = pickle.load(f)
 
 # Load CODE and LOG matrices
-CODE = pd.read_csv(f'./CODE.csv', index_col='GENE')
+CODE = pd.read_csv(f'./data/CODE.csv', index_col='GENE')
 
 # Map cluster IDs to CODE and LOG
 gene_to_cluster = {}

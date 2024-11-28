@@ -12,16 +12,16 @@ selected_feature = st.selectbox(
 # Filter data using color scale
 color_min, color_max = st.slider(
     f"Filter genes (points) by {selected_feature}",
-    min_value=float(CODE[selected_feature].min()),
-    max_value=float(CODE[selected_feature].max()),
-    value=(float(CODE[selected_feature].min()), float(CODE[selected_feature].max())),
+    min_value=float(DATA[selected_feature].min()),
+    max_value=float(DATA[selected_feature].max()),
+    value=(float(DATA[selected_feature].min()), float(DATA[selected_feature].max())),
     step=0.01
 )
-filtered_data = CODE[(CODE[selected_feature] >= color_min) & (CODE[selected_feature] <= color_max)]
+filtered_data = DATA[(DATA[selected_feature] >= color_min) & (DATA[selected_feature] <= color_max)]
 
 # Calculate the number of selected genes
 num_selected_genes = filtered_data.shape[0]
-total_genes = CODE.shape[0]
+total_genes = DATA.shape[0]
 scatter_title = f"({num_selected_genes}/{total_genes} genes selected)"
 
 # Layout for scatter plot and violin plot
@@ -37,12 +37,12 @@ with col1:
     # Create scatter plot
     fig = px.scatter(
         filtered_data,
-        x="UMAP1",
-        y="UMAP2",
+        x="VAE_UMAP1",
+        y="VAE_UMAP2",
         color=selected_feature,
-        hover_data=["UMAP1", "UMAP2", selected_feature],
+        hover_data=["VAE_UMAP1", "VAE_UMAP2", selected_feature],
         title=scatter_title,
-        labels={"UMAP1": "UMAP 1", "UMAP2": "UMAP 2"},
+        labels={"VAE_UMAP1": "UMAP1" , "VAE_UMAP2": "UMAP2"},
         color_continuous_scale=colormap
     )
     fig.update_traces(marker=dict(size=point_size))
@@ -59,7 +59,7 @@ with col2:
     box_violin_fig = go.Figure()
     box_violin_fig.add_trace(
         go.Violin(
-            y=CODE[selected_feature],
+            y=DATA[selected_feature],
             box=dict(visible=True),
             meanline=dict(visible=True),
             line_color="gray",

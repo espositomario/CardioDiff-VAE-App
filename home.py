@@ -16,6 +16,10 @@ from pandas.api.types import (
 )
 
 
+# Streamlit app layout
+st.set_page_config(layout="wide")
+#st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="collapsed", menu_items=None)
+
 
 CT_LIST = ['ESC', 'MES', 'CP', 'CM']
 HM_LIST = ['H3K4me3', 'H3K27ac', 'H3K27me3',  'RNA']
@@ -170,10 +174,6 @@ def df_tabs(DF):
                     help="This table contains RNA-seq FPKM (Fragments Per Kilobase of transcript per Million mapped reads) values for gene expression across different cell types.")
         st.dataframe(filter_dataframe(FPKM))
 
-
-# Streamlit app layout
-st.set_page_config(layout="wide")
-#st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="collapsed", menu_items=None)
 
 
 

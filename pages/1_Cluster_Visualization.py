@@ -1,4 +1,45 @@
 from home import * 
+st.set_page_config(layout="wide")
+
+#tabs = st.tabs(["CV", "Gonzalez"])
+# Define file paths
+CV_file = f"./data/plots/Clusters_CV.pdf"
+Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
+st.markdown("<h3 style='text-align: center;'>CV</h3>", unsafe_allow_html=True,
+            help="...")
+pdf_viewer(CV_file)
+try:
+    with open(CV_file, "rb") as pdf_file:
+        CV_data = pdf_file.read()
+    st.download_button(
+        label="",
+        icon=":material/download:",
+        data=CV_data,
+        file_name=f"CV_Categories_Clusters_Intersection.pdf",
+        mime="application/pdf",
+    )
+except FileNotFoundError:
+    st.error("file not found.")
+
+
+st.markdown("<h3 style='text-align: center;'>Gonzalez</h3>", unsafe_allow_html=True,
+            help="...")
+pdf_viewer(Gonzalez_file)
+try:
+    with open(Gonzalez_file, "rb") as pdf_file:
+        Gonzalez_data = pdf_file.read()
+    st.download_button(
+        label="",
+        icon=":material/download:",
+        data=Gonzalez_data,
+        file_name=f"Gonzalez_Categories_Clusters_Intersection.pdf",
+        mime="application/pdf",
+    )
+except FileNotFoundError:
+    st.error("file not found.")
+    
+    
+        
 
 
 st.markdown("<h1 style='text-align: center;'>Cluster visualization</h1>", unsafe_allow_html=True)

@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
+import numpy as np
 import pickle
 import os
 from plotly.graph_objects import Figure, Violin
@@ -175,29 +176,83 @@ FPKM_features = [ 'RNA_ESC_1', 'RNA_ESC_2', 'RNA_MES_1', 'RNA_MES_2',
             'RNA_CP_1', 'RNA_CP_2', 'RNA_CM_1', 'RNA_CM_2']
 
 
+COLOR_FEATURES = MISC_features + Z_AVG_features + LOG_FC_features
 
 
-selected_feature = Z_AVG_features[0]
 
-point_size = 3
-colormap = "Spectral_r"
-def scatter_continous(DATA, selected_feature, point_size, colormap):
-    fig = px.scatter(
-        DATA,
-        x="VAE_UMAP1",
-        y="VAE_UMAP2",
-        color=selected_feature,
-        hover_data=[DATA.index,"Cluster", selected_feature],
-        title=selected_feature,
-        labels={"VAE_UMAP1": "UMAP1" , "VAE_UMAP2": "UMAP2"},
-        color_continuous_scale=colormap
-    )
-    fig.update_traces(marker=dict(size=point_size))
+def scatter_continous(DATA, selected_feature,key, point_size=3, colormap='Spectral_r'):
+    CAT = False
+    if pd.api.types.is_categorical_dtype(DATA[selected_feature]) or DATA[selected_feature].dtype == 'object':
+        CAT = True
+    with st.popover("⚙️", ):
+        point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key+'point_size')
+        point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=0.8, step=0.1, key=key+'point_opacity')
+        if not CAT:
+            colormap = st.segmented_control("Select Colormap", ["Turbo", "Blues","viridis", "RdBu_r"], default= 'Turbo',selection_mode='single', key=key+'colormap')
+            min_col, max_col = st.slider("Color Range (percentile)", min_value=1, max_value=99, value=(1,99), step=1, key=key+'min_max')
+
+    # Determine if the selected feature is categorical or continuous
+    if CAT:
+        # Handle categorical feature
+        fig = px.scatter(
+            DATA,
+            x="VAE_UMAP1",
+            y="VAE_UMAP2",
+            color=selected_feature,
+            hover_data=[DATA.index, "Cluster", selected_feature],
+            title=f"{selected_feature}",
+            labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
+            #color_discrete_map=color_dict,  # Apply the color dictionary for consistent category colors
+        )
+    else:
+        # Handle continuous feature
+        # Compute 1st and 99th percentiles for color scaling
+        
+
+        min_p, max_p = np.percentile(DATA[selected_feature], [min_col, max_col])
+        fig = px.scatter(
+            DATA,
+            x="VAE_UMAP1",
+            y="VAE_UMAP2",
+            color=selected_feature,
+            hover_data=[DATA.index, "Cluster", selected_feature],
+            title=f"{selected_feature}",
+            labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
+            color_continuous_scale=colormap,
+            range_color=(min_p, max_p),  # Apply percentile scaling
+        )
+    
+    
+    
+    fig.update_traces(marker=dict(size=point_size, opacity=point_opacity))
+
     fig.update_layout(
         xaxis_showgrid=False, yaxis_showgrid=False,
         xaxis_tickvals=[], yaxis_tickvals=[],
         plot_bgcolor="white", autosize=True
     )
     return fig
-    
 
+
+C = st.columns(2)
+with C[0]:    
+    KEY1 = 'key1'
+    # Dropdown for feature selection
+    SEL_FEAT_1 = st.selectbox(
+        "Color By", key=KEY1+'sel_box',
+        options=COLOR_FEATURES,
+        index=0  # Default to the first feature
+    )
+    fig1 = scatter_continous(DATA, SEL_FEAT_1,key=KEY1+'popover')
+    st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
+
+with C[1]:    
+    KEY2 = 'key2'
+    # Dropdown for feature selection
+    SEL_FEAT_2 = st.selectbox(
+        "Color By", key=KEY2+'sel_box',
+        options=COLOR_FEATURES,
+        index=0  # Default to the first feature
+    )
+    fig2 = scatter_continous(DATA, SEL_FEAT_2,KEY2+'popover')
+    st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')

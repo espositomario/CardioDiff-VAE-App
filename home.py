@@ -17,6 +17,38 @@ from pandas.api.types import (
 
 
 
+CT_LIST = ['ESC', 'MES', 'CP', 'CM']
+HM_LIST = ['H3K4me3', 'H3K27ac', 'H3K27me3',  'RNA']
+PREFIXES = [HM + '_' + CT for HM in HM_LIST for CT in CT_LIST]
+
+
+MARKER_GENES_EXT = {'ESC': ['Nanog','Pou5f1','Sox2','L1td1','Dppa5a','Tdh','Esrrb','Lefty1','Zfp42','Sfn','Lncenc1','Utf1'],
+                    'MES': ['Mesp1','Mesp2','T', 'Vrtn','Dll3','Dll1', 'Evx1','Cxcr4','Pcdh8','Pcdh19','Robo3','Slit1'],
+                    'CP':  ['Sfrp5', 'Gata5', 'Tek','Hbb-bh1','Hba-x', 'Pyy','Sox18','Lyl1','Rgs4','Igsf11','Tlx1','Ctse'],
+                    'CM':  ['Nppa','Gipr', 'Actn2', 'Coro6', 'Col3a1', 'Bgn','Myh6','Myh7','Tnni3','Hspb7' ,'Igfbp7','Ndrg2'],
+                    }
+
+
+
+HM_COL_DICT = {'H3K4me3': '#f37654','H3K27ac': '#b62a77','H3K27me3': '#39A8AC','RNA':'#ED455C'}
+CT_COL_DICT= {'ESC': '#405074',
+                'MES': '#7d5185',
+                'CP': '#c36171',
+                'CM': '#eea98d',}
+
+CV_COL_DICT= {'RNA_ESC': '#405074',
+                'RNA_MES': '#7d5185',
+                'RNA_CP': '#c36171',
+                'RNA_CM': '#eea98d',
+                'STABLE':'#B4CD70',
+                'other':'#ECECEC'}
+GONZALEZ_COL_DICT= {'Active': '#E5AA44','Bivalent': '#7442BE','other':'#ECECEC'}
+
+COLOR_DICTS = {
+    "CV_Category": CV_COL_DICT,
+    "ESC_ChromState_Gonzalez2021": GONZALEZ_COL_DICT,
+}
+
 
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -180,10 +212,12 @@ COLOR_FEATURES = MISC_features + Z_AVG_features + LOG_FC_features
 
 
 
-def scatter_continous(DATA, selected_feature,key, point_size=3, colormap='Spectral_r'):
+def scatter(DATA, selected_feature,key, COLOR_DICTS=None):
     CAT = False
     if pd.api.types.is_categorical_dtype(DATA[selected_feature]) or DATA[selected_feature].dtype == 'object':
         CAT = True
+        color_dict = COLOR_DICTS.get(selected_feature, None)
+        
     with st.popover("⚙️", ):
         point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key+'point_size')
         point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=0.8, step=0.1, key=key+'point_opacity')
@@ -202,7 +236,7 @@ def scatter_continous(DATA, selected_feature,key, point_size=3, colormap='Spectr
             hover_data=[DATA.index, "Cluster", selected_feature],
             title=f"{selected_feature}",
             labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
-            #color_discrete_map=color_dict,  # Apply the color dictionary for consistent category colors
+            color_discrete_map=color_dict if color_dict else None
         )
     else:
         # Handle continuous feature
@@ -241,9 +275,9 @@ with C[0]:
     SEL_FEAT_1 = st.selectbox(
         "Color By", key=KEY1+'sel_box',
         options=COLOR_FEATURES,
-        index=0  # Default to the first feature
+        index=3  # Default to the first feature
     )
-    fig1 = scatter_continous(DATA, SEL_FEAT_1,key=KEY1+'popover')
+    fig1 = scatter(DATA, SEL_FEAT_1,key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS)
     st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
 with C[1]:    
@@ -252,7 +286,7 @@ with C[1]:
     SEL_FEAT_2 = st.selectbox(
         "Color By", key=KEY2+'sel_box',
         options=COLOR_FEATURES,
-        index=0  # Default to the first feature
+        index=2  # Default to the first feature
     )
-    fig2 = scatter_continous(DATA, SEL_FEAT_2,KEY2+'popover')
+    fig2 = scatter(DATA, SEL_FEAT_2,KEY2+'popover',COLOR_DICTS=COLOR_DICTS)
     st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')

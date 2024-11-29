@@ -3,14 +3,15 @@ from utils.my_module import *
 st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
 
 
+st.markdown("<h1 style='text-align: center;'>Clusters composition</h1>", unsafe_allow_html=True)
 
 C = st.columns(2)
+
 CV_file = f"./data/plots/Clusters_CV.pdf"
 Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
 
+
 with C[0]:
-    st.markdown("<h3 style='text-align: center;'>CV</h3>", unsafe_allow_html=True,
-                help="...")
     pdf_viewer(CV_file)
     try:
         with open(CV_file, "rb") as pdf_file:
@@ -26,8 +27,6 @@ with C[0]:
         st.error("file not found.")
 
 with C[1]:
-    st.markdown("<h3 style='text-align: center;'>Gonzalez</h3>", unsafe_allow_html=True,
-                help="...")
     pdf_viewer(Gonzalez_file)
     try:
         with open(Gonzalez_file, "rb") as pdf_file:
@@ -42,11 +41,9 @@ with C[1]:
     except FileNotFoundError:
         st.error("file not found.")
         
-        
-        
 
 #--------------------------------------------------------------
-st.markdown("<h1 style='text-align: center;'>Cluster visualization</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
 
 # Create two columns for layout
 CC = st.columns(5)
@@ -85,9 +82,75 @@ with CC[4]:
             else:
                 st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
 
+
 #--------------------------------------------------------------            
 st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
-    
+
+
+
+def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
+    """
+    Plot stacked bar charts for multiple features in a single plot.
+
+    Parameters:
+    - DATA: pandas DataFrame containing the data.
+    - feature_columns: List of column names to plot.
+    - COLOR_DICTS: Dictionary where keys are column names and values are color dictionaries.
+    """
+    fig = go.Figure()
+
+    for col in feature_columns:
+        # Get value counts and corresponding colors
+        counts = DATA[col].value_counts().to_dict()
+        color_dict = COLOR_DICTS.get(col, {})  # Default to empty if no dict provided
+
+        # Sort counts by color_dict key order
+        sorted_categories = [key for key in color_dict.keys() if key in counts]
+        sorted_counts = {cat: counts[cat] for cat in sorted_categories}
+
+        # Add bars for each category in the column
+        for category in sorted_categories:
+            count = sorted_counts.get(category, 0)
+            fig.add_trace(
+                go.Bar(
+                    name=category,  # Show only category in legend
+                    x=[count],  # Counts on x-axis
+                    y=[col],  # Feature name on y-axis
+                    orientation='h',  # Horizontal bar orientation
+                    marker_color=color_dict.get(category, color_dict.get("other", "grey")),
+                    hoverinfo="x",
+                    text=[category],  # Display the category name
+                    textposition="inside",  # Position text horizontally inside the bar
+                    legend=None,  # Do not show legend for each category
+                )
+            )
+    # Update layout for stacked bar
+    fig.update_layout(
+        barmode="stack",
+        title="Stacked Bar Plot for Selected Features",
+        xaxis=dict(title="# of genes"),
+        yaxis=dict(title="", showticklabels=False),
+        plot_bgcolor="white"
+    )
+    # Remove duplicate legend entries (if categories repeat across features)
+
+
+    return fig
+
+
+
+C= st.columns(3)
+with C[0]:
+    bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
+    st.plotly_chart(bar_comp, use_container_width=True)
+
+
+
+
+
+
+
+
 C = st.columns(2)
 with C[0]:    
     

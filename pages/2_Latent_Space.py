@@ -3,10 +3,8 @@ st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
 
 st.title("Gene encoding in VAE 6D Latent Space")
 
-
-
-
 C = st.columns(2)
+
 with C[0]:    
     KEY1 = 'key1'
     # Dropdown for feature selection

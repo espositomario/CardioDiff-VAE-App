@@ -84,7 +84,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     modification_container = st.container()
 
     with modification_container:
-        to_filter_columns = st.multiselect("Select columns to filter genes", df.columns)
+        to_filter_columns = st.multiselect("Select columns by which filter genes", df.columns)
         for column in to_filter_columns:
             left, right = st.columns((1, 20))
             left.write("↳")

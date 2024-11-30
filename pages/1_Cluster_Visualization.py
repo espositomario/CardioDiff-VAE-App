@@ -254,15 +254,11 @@ with C[1]:
         )
 
 
-#--------------------------------------------------------------
-with st.expander("Cluster Data Table", icon=":material/table_chart:"):
-    SEL = DATA[DATA['Cluster'] == k]
-    df_tabs(SEL)
-    download_genes_list(GENE_LIST, k, key="download_gene_list_2")
-    
+SEL = DATA[DATA['Cluster'] == k]
+
 
 #--------------------------------------------------------------
-with st.expander("Gene Expression Dynamics", icon=":material/trending_up:"):
+with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expanded=True):
     st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
     # Randomly select 16 genes as default
     
@@ -315,7 +311,7 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:"):
             df = df.dropna()
 
             # Compute average values for arrows
-            avg_df = df.groupby('CT')[Y_LAB].mean().reset_index().sort_values('CT')
+            avg_df = df.groupby('CT', observed=False)[Y_LAB].mean().reset_index().sort_values('CT')
 
             # Determine subplot location
             row = (i // grid_size) + 1
@@ -391,8 +387,15 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:"):
 
         return fig
 
-
     if SEL_GENES:
         FPKM = SEL.filter(FPKM_features)
         fig = plot_gene_trend(np.log2(FPKM+1), SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB="log2(FPKM+1)")
         st.plotly_chart(fig, use_container_width=True)
+
+
+
+#--------------------------------------------------------------
+with st.expander("Cluster Data Table", icon=":material/table_chart:"):
+    df_tabs(SEL)
+    download_genes_list(GENE_LIST, k, key="download_gene_list_2")
+    

@@ -1,4 +1,5 @@
 import streamlit as st
+import random
 import plotly.express as px
 import pandas as pd
 import numpy as np
@@ -9,7 +10,8 @@ import plotly.graph_objects as go
 #custom components
 from streamlit_pdf_viewer import pdf_viewer
 from streamlit_extras.bottom_container import bottom
-
+from plotly.subplots import make_subplots
+import math
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,

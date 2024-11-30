@@ -17,6 +17,9 @@ with C[0]:
     st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
 with C[1]:    
+    
+    
+
     KEY2 = 'key2'
     # Dropdown for feature selection
     SEL_FEAT_2 = st.selectbox(
@@ -26,3 +29,10 @@ with C[1]:
     )
     fig2 = scatter(DATA, SEL_FEAT_2,KEY2+'popover',COLOR_DICTS=COLOR_DICTS)
     st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
+    
+    
+    
+SEL_GENES= st.multiselect("Select a gene", options=DATA.index, 
+                max_selections=12,
+                key="select a gene")
+st.write(", ".join(SEL_GENES))

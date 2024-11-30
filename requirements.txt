@@ -3,3 +3,4 @@ plotly
 pandas
 streamlit-pdf-viewer
 streamlit-extras
+streamlit-searchbox

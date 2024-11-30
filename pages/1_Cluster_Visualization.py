@@ -1,6 +1,7 @@
 from utils.my_module import *
 
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(layout="wide", initial_sidebar_state="expanded", 
+                    page_icon=":material/search:")
 
 # Define session state variables for `k` and `gene_query`
 if "k" not in st.session_state:
@@ -254,11 +255,144 @@ with C[1]:
 
 
 #--------------------------------------------------------------
-with st.expander("Cluster Data Table"):
+with st.expander("Cluster Data Table", icon=":material/table_chart:"):
     SEL = DATA[DATA['Cluster'] == k]
     df_tabs(SEL)
     download_genes_list(GENE_LIST, k, key="download_gene_list_2")
     
 
+#--------------------------------------------------------------
+with st.expander("Gene Expression Dynamics", icon=":material/trending_up:"):
+    st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
+    # Randomly select 16 genes as default
+    
+    random.seed(42)
+    default_genes = random.sample(SEL.index.to_list(), 16)
+    
+    SEL_GENES = st.multiselect(
+        "Select genes (default: 16 random genes)", 
+        options=SEL.index, 
+        default=default_genes,  # Pre-select 16 random genes
+        key="select_a_gene"
+    )
+
+    def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
+        """
+        Plot trends for selected genes across conditions with arrow connections between average points.
+        
+        Parameters:
+            DATA (pd.DataFrame): DataFrame where rows are genes, columns are RNA counts.
+            SEL_GENES (list): List of gene names to plot.
+            CT_LIST (list): List of ordered conditions (e.g., ["ESC", "MES", "CP", "CM"]).
+            CT_COL_DICT (dict): Mapping of condition names to colors.
+            Y_LAB (str): Label for the Y-axis.
+
+        Returns:
+            Plotly figure with subplots for each gene's trend.
+        """
 
 
+        num_genes = len(SEL_GENES)
+        grid_size = math.ceil(math.sqrt(num_genes))  # Create a square grid layout
+
+        # Create subplot figure
+        fig = make_subplots(
+            rows=grid_size, cols=grid_size,
+            subplot_titles=SEL_GENES,
+            horizontal_spacing=0.05, vertical_spacing=0.1
+        )
+
+        for i, gene_name in enumerate(SEL_GENES):
+            # Extract gene data
+            gene_data = DATA.loc[gene_name]
+
+            # Extract condition (CT) and replicate (REP) information
+            CT = pd.Categorical(gene_data.index.str.extract(f"({'|'.join(CT_LIST)})")[0], categories=CT_LIST, ordered=True)
+            REP = gene_data.index.str.extract(r'(\d)')[0]
+            df = pd.DataFrame({Y_LAB: gene_data.values, 'CT': CT, 'REP': REP})
+
+            # Filter out invalid rows
+            df = df.dropna()
+
+            # Compute average values for arrows
+            avg_df = df.groupby('CT')[Y_LAB].mean().reset_index().sort_values('CT')
+
+            # Determine subplot location
+            row = (i // grid_size) + 1
+            col = (i % grid_size) + 1
+
+            # Add scatter plot for individual points
+            for ct in CT_LIST:
+                ct_data = df[df['CT'] == ct]
+                fig.add_trace(
+                    go.Scatter(
+                        x=ct_data['CT'],
+                        y=ct_data[Y_LAB],
+                        mode='markers',
+                        marker=dict(
+                            size=20,
+                            color=CT_COL_DICT[ct],
+                            #line=dict(color='silver', width=1)  # Gray outline
+                        ),
+                        name=ct,
+                        showlegend=False,  # Avoid duplicating legends
+                        hovertemplate=f"{ct}"
+                    ),
+                    row=row, col=col
+                )
+
+            # Add arrows between average points
+            for j in range(len(avg_df) - 1):
+                #fig.add_trace(
+                #    go.Scatter(
+                #        x=[avg_df.iloc[j]["CT"], avg_df.iloc[j + 1]["CT"]],
+                #        y=[avg_df.iloc[j][Y_LAB], avg_df.iloc[j + 1][Y_LAB]],
+                #        mode="lines+markers",
+                #        line=dict(color="black", width=1),  # Line appearance
+                #        marker=dict(size=1),  # Make points invisible
+                #        showlegend=False,
+                #    ),
+                #    row=row, col=col,
+                #)
+                fig.add_annotation(
+                    x=avg_df.iloc[j + 1]["CT"],
+                    y=avg_df.iloc[j + 1][Y_LAB],
+                    ax=avg_df.iloc[j]["CT"],
+                    ay=avg_df.iloc[j][Y_LAB],
+                    xref=f"x{i + 1}",
+                    yref=f"y{i + 1}",
+                    axref=f"x{i + 1}",
+                    ayref=f"y{i + 1}",
+                    arrowhead=5,
+                    arrowsize=2,
+                    arrowwidth=1,
+                    arrowcolor="grey",
+                    showarrow=True,
+                )
+
+            # Update subplot axes
+            y_max = math.ceil(df[Y_LAB].max() * 1.1)  # Determine max value with padding
+            fig.update_xaxes(title_text="", row=row, col=col, showticklabels=False)
+            fig.update_yaxes(
+                title_text=Y_LAB if col == 1 else "",
+                row=row, col=col,
+                range=[0, y_max],  # Limit range from 0 to max
+                tickvals=[0, y_max],  # Display only 0 and max
+                ticktext=[0, y_max],
+            )
+
+        # Update figure layout
+        fig.update_layout(
+            height=300 * grid_size, width=300 * grid_size,
+            title_text=None,
+            showlegend=False,
+            plot_bgcolor="white",
+        )
+
+        return fig
+
+
+    if SEL_GENES:
+        FPKM = SEL.filter(FPKM_features)
+        fig = plot_gene_trend(np.log2(FPKM+1), SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB="log2(FPKM+1)")
+        st.plotly_chart(fig, use_container_width=True)

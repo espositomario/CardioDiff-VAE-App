@@ -1,4 +1,7 @@
-# 🎈 Blank app template
+https://cardiodiff-vae.streamlit.app/
+
+
+# Run locally run
 
 
 1. Install the requirements

@@ -1,9 +1,9 @@
 from utils.my_module import *
 st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
 
-st.title("Gene encoding in VAE 6D Latent Space")
+st.markdown("<h1 style='text-align: center;'>Gene encoded in the VAE Latent Space</h1>", unsafe_allow_html=True)
 
-C = st.columns(2)
+C = st.columns(2,gap="large")
 
 with C[0]:    
     KEY1 = 'key1'

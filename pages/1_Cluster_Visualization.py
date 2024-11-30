@@ -1,15 +1,71 @@
 from utils.my_module import *
 
-st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
+# Define session state variables for `k` and `gene_query`
+if "k" not in st.session_state:
+    st.session_state.k = 76  # Default cluster
+if "gene_query" not in st.session_state:
+    st.session_state.gene_query = ""
+
+# Function to update `k` from gene query and clear `gene_query`
+def update_cluster_and_clear_query(k_value):
+    st.session_state.k = k_value  # Update `k` in session state
+    st.session_state.gene_query = ""  # Clear the query after updating
+
+with st.sidebar:
+    # Cluster selector input
+    k = st.number_input(
+        label="Cluster",
+        min_value=0,
+        max_value=79,
+        step=1,
+        value=st.session_state.k,
+        placeholder="Enter a number between 0 and 79",
+        key="cluster_input",
+    )
+
+    # Fetch cluster information dynamically
+    NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
+    GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
+
+    st.write(f"\# of genes = {NUM_OF_GENES}")
+
+    with st.popover(" Gene",icon=":material/search:"):
+        st.markdown("<h3 style='text-align: center;'>Find where is a Gene</h3>", unsafe_allow_html=True)
+
+        # Use session state for text input
+        gene_query = st.text_input(
+            "Enter a mouse Refseq Gene symbol (e.g., Pim1)",
+            value=st.session_state.gene_query,
+            key="gene_query",
+        )
+
+        if gene_query:
+            if gene_query in DATA.index:
+                new_k = DATA.loc[gene_query, 'Cluster']
+                
+                CC = st.columns(2)
+                with CC[0]:
+                    st.write(f"{gene_query} is in Cluster {new_k}.")
+                
+                # Button to update the cluster and clear the gene query
+                with CC[1]:
+                    st.button("",icon=":material/arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
+            else:
+                st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
+
+
+
 
 
 st.markdown("<h1 style='text-align: center;'>Clusters composition</h1>", unsafe_allow_html=True)
 
-C = st.columns(2)
+C = st.columns(2, gap="large")
 
+# Cluster composition file viewers
 CV_file = f"./data/plots/Clusters_CV.pdf"
 Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
-
 
 with C[0]:
     pdf_viewer(CV_file)
@@ -20,11 +76,11 @@ with C[0]:
             label="",
             icon=":material/download:",
             data=CV_data,
-            file_name=f"CV_Categories_Clusters_Intersection.pdf",
+            file_name="CV_Categories_Clusters_Intersection.pdf",
             mime="application/pdf",
         )
     except FileNotFoundError:
-        st.error("file not found.")
+        st.error("File not found.")
 
 with C[1]:
     pdf_viewer(Gonzalez_file)
@@ -35,52 +91,19 @@ with C[1]:
             label="",
             icon=":material/download:",
             data=Gonzalez_data,
-            file_name=f"Gonzalez_Categories_Clusters_Intersection.pdf",
+            file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
             mime="application/pdf",
         )
     except FileNotFoundError:
-        st.error("file not found.")
-        
+        st.error("File not found.")
 
-#--------------------------------------------------------------
+# --------------------------------------------------------------
 st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
 
-# Create two columns for layout
-CC = st.columns(5)
-    
-with CC[1]:
-    # Input field for selecting k (from 0 to 79)
-    k = st.number_input(label="Select a Cluster (from 0 to 79)", label_visibility="collapsed"
-                        , min_value=0, max_value=79, step=1, value=76, placeholder="Enter a number between 0 and 79")
+# Create layout for exploring clusters
+CC = st.columns(6, vertical_alignment="bottom", gap="large")
 
-    NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
-    GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
 
-with CC[2]:
-    # Convert the list to a string with each element on a new line
-    file_content = "\n".join(GENE_LIST)
-
-    st.download_button(
-        label="Gene List",
-        icon=":material/download:",
-        data=file_content,
-        file_name=f"C{k}_GeneIDsList.txt",
-        mime="text/plain"
-    )
-
-    
-with CC[4]:
-    # Add a tool to query by GENE
-    with st.popover("🔍 Cluster by Gene"):
-        st.markdown("<h3 style='text-align: center;'>Find where is a Gene</h3>", unsafe_allow_html=True)
-        gene_query = st.text_input("Enter a mouse Refseq Gene symbol (e.g., Pim1)")
-
-        if gene_query:
-            if gene_query in DATA.index:
-                k = DATA.loc[gene_query, 'Cluster']
-                st.write(f"{gene_query} is in Cluster {k}.")
-            else:
-                st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
 
 
 #--------------------------------------------------------------            
@@ -113,24 +136,25 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
             count = sorted_counts.get(category, 0)
             fig.add_trace(
                 go.Bar(
-                    name=category,  # Show only category in legend
                     x=[count],  # Counts on x-axis
                     y=[col],  # Feature name on y-axis
                     orientation='h',  # Horizontal bar orientation
                     marker_color=color_dict.get(category, color_dict.get("other", "grey")),
-                    hoverinfo="x",
+                    hovertemplate=f"{category}: {count}<extra></extra>",  # Display category and count
+
                     text=[category],  # Display the category name
                     textposition="inside",  # Position text horizontally inside the bar
-                    legend=None,  # Do not show legend for each category
                 )
             )
     # Update layout for stacked bar
     fig.update_layout(
         barmode="stack",
-        title="Stacked Bar Plot for Selected Features",
+        title="Cluster composition in term of categories",
         xaxis=dict(title="# of genes"),
         yaxis=dict(title="", showticklabels=False),
-        plot_bgcolor="white"
+        plot_bgcolor="white",
+        showlegend=False  # Hide the legend
+
     )
     # Remove duplicate legend entries (if categories repeat across features)
 
@@ -151,7 +175,7 @@ with C[0]:
 
 
 
-C = st.columns(2)
+C = st.columns(2, gap="large")
 with C[0]:    
     
     # Define file paths
@@ -206,6 +230,22 @@ with C[1]:
 with st.expander("Cluster Data Table"):
     SEL = DATA[DATA['Cluster'] == k]
     df_tabs(SEL)
+
+
+
+# Convert the list to a string with each element on a new line
+    file_content = "\n".join(GENE_LIST)
+
+    st.download_button(
+        label="Gene List",
+        icon=":material/download:",
+        data=file_content,
+        file_name=f"C{k}_GeneIDsList.txt",
+        mime="text/plain"
+    )
+    
+    
+    
 
 
 

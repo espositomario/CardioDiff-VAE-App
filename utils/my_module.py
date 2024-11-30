@@ -6,7 +6,9 @@ import pickle
 import os
 from plotly.graph_objects import Figure, Violin
 import plotly.graph_objects as go
+#custom components
 from streamlit_pdf_viewer import pdf_viewer
+from streamlit_extras.bottom_container import bottom
 
 from pandas.api.types import (
     is_categorical_dtype,
@@ -259,4 +261,21 @@ FPKM_features = [ 'RNA_ESC_1', 'RNA_ESC_2', 'RNA_MES_1', 'RNA_MES_2',
 
 
 COLOR_FEATURES = MISC_features + Z_AVG_features + LOG_FC_features
+
+
+
+
+def bottom_cluster():
+
+    with bottom():
+        # Create two columns for layout
+        # Input field for selecting k (from 0 to 79)
+        k = st.number_input(label="Select a Cluster (from 0 to 79)"
+                            , min_value=0, max_value=79, step=1, value=76, placeholder="Enter a number between 0 and 79")
+
+        NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
+        GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
+
+            
+            
 

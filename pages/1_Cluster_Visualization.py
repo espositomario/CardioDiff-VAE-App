@@ -38,47 +38,44 @@ def download_genes_list(GENE_LIST, k, key):
     
 with st.sidebar:
 
-    
-
     # Cluster selector input
     k = st.number_input(
-    label="Cluster",
-    min_value=0,
-    max_value=79,
-    step=1,
-    value=st.session_state.k,
-    placeholder="Enter a number between 0 and 79",
-    key="cluster_input",
+        label="Cluster",
+        min_value=0,
+        max_value=79,
+        step=1,
+        value=st.session_state.k,
+        placeholder="Enter a number between 0 and 79",
+        key="cluster_input",
     )
     
     NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
     GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
         
-        
-    with st.popover("Gene",icon=":material/search:"):
-        #st.markdown("<h4 style='text-align: center;'>Find Cluster by Gene</h4>", unsafe_allow_html=True)
-
-        # Use session state for text input
-        gene_query = st.text_input(
-            "Refseq Mouse Gene Symbol",
-            placeholder="e.g., Gata4",
-            value=st.session_state.gene_query,
+    with st.popover("Gene", icon=":material/search:"):
+        # Single-select dropdown for gene query
+        gene_query = st.selectbox(
+            "Find in which cluster a gene is",
+            options=[""] + list(DATA.index),  # Empty string for no default selection
+            format_func=lambda x: "Type a gene symbol..." if x == "" else x,
+            help='Refseq Gene Symbol in Mouse',
             key="gene_query",
         )
 
-        if gene_query:
-            if gene_query in DATA.index:
-                new_k = DATA.loc[gene_query, 'Cluster']
-                
-                CC = st.columns(2)
-                with CC[0]:
-                    st.write(f"{gene_query} is in Cluster {new_k}.")
-                
-                # Button to update the cluster and clear the gene query
-                with CC[1]:
-                    st.button("",icon=":material/arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
-            else:
-                st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
+        # Check if a gene is selected
+        if gene_query and gene_query != "":  # Ignore empty selection
+            new_k = DATA.loc[gene_query, 'Cluster']
+            
+            CC = st.columns(2)
+            with CC[0]:
+                st.write(f"Go to Cluster {new_k}")
+            
+            # Button to update the cluster and clear the gene query
+            with CC[1]:
+                st.button(":material/arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
+        
+
+
 
     
     download_genes_list(GENE_LIST, k, key="download_gene_list_1")

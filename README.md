@@ -1,7 +1,7 @@
-https://cardiodiff-vae.streamlit.app/
+Open the [Streamlit App](https://cardiodiff-vae.streamlit.app/)
 
 
-# Run locally run
+### Run locally 
 
 
 1. Install the requirements

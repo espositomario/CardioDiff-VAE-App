@@ -13,30 +13,54 @@ def update_cluster_and_clear_query(k_value):
     st.session_state.k = k_value  # Update `k` in session state
     st.session_state.gene_query = ""  # Clear the query after updating
 
+def download_genes_list(GENE_LIST, k, key):
+    """
+    Download a list of genes as a text file.
+
+    Parameters:
+    - GENE_LIST: List of gene IDs to download.
+    - k: Cluster number for file name.
+    """
+    # Convert the list to a string with each element on a new line
+    GENE_LIST_FILE = "\n".join(GENE_LIST)
+
+    st.download_button(
+        label="Gene List",
+        icon=":material/download:",
+        data=GENE_LIST_FILE,
+        file_name=f"C{k}_GeneIDsList.txt",
+        mime="text/plain",
+        key=key
+    )
+    
+    
+    
 with st.sidebar:
+
+    
+
     # Cluster selector input
     k = st.number_input(
-        label="Cluster",
-        min_value=0,
-        max_value=79,
-        step=1,
-        value=st.session_state.k,
-        placeholder="Enter a number between 0 and 79",
-        key="cluster_input",
+    label="Cluster",
+    min_value=0,
+    max_value=79,
+    step=1,
+    value=st.session_state.k,
+    placeholder="Enter a number between 0 and 79",
+    key="cluster_input",
     )
-
-    # Fetch cluster information dynamically
+    
     NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
     GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
-
-    st.write(f"\# of genes = {NUM_OF_GENES}")
-
-    with st.popover(" Gene",icon=":material/search:"):
-        st.markdown("<h3 style='text-align: center;'>Find where is a Gene</h3>", unsafe_allow_html=True)
+        
+        
+    with st.popover("Gene",icon=":material/search:"):
+        #st.markdown("<h4 style='text-align: center;'>Find Cluster by Gene</h4>", unsafe_allow_html=True)
 
         # Use session state for text input
         gene_query = st.text_input(
-            "Enter a mouse Refseq Gene symbol (e.g., Pim1)",
+            "Refseq Mouse Gene Symbol",
+            placeholder="e.g., Gata4",
             value=st.session_state.gene_query,
             key="gene_query",
         )
@@ -55,7 +79,10 @@ with st.sidebar:
             else:
                 st.write(f"Gene symbol: '{gene_query}' not found in the data. (Only mouse RefSeq gene symbols are accepted, notice that not all genes were included in the dataset)")
 
+    
+    download_genes_list(GENE_LIST, k, key="download_gene_list_1")
 
+    
 
 
 
@@ -230,21 +257,7 @@ with C[1]:
 with st.expander("Cluster Data Table"):
     SEL = DATA[DATA['Cluster'] == k]
     df_tabs(SEL)
-
-
-
-# Convert the list to a string with each element on a new line
-    file_content = "\n".join(GENE_LIST)
-
-    st.download_button(
-        label="Gene List",
-        icon=":material/download:",
-        data=file_content,
-        file_name=f"C{k}_GeneIDsList.txt",
-        mime="text/plain"
-    )
-    
-    
+    download_genes_list(GENE_LIST, k, key="download_gene_list_2")
     
 
 

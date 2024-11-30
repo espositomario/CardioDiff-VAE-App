@@ -1,5 +1,5 @@
 from utils.my_module import *
-st.set_page_config(layout="wide", initial_sidebar_state='collapsed')
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("<h1 style='text-align: center;'>Gene encoded in the VAE Latent Space</h1>", unsafe_allow_html=True)
 

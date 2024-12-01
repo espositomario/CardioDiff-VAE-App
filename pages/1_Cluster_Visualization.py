@@ -304,7 +304,7 @@ def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
         fig = make_subplots(
             rows=grid_size, cols=grid_size,
             subplot_titles=SEL_GENES,
-            horizontal_spacing=0.05, vertical_spacing=0.1
+            horizontal_spacing=0.1, vertical_spacing=0.1,
         )
 
         for i, gene_name in enumerate(SEL_GENES):
@@ -421,13 +421,24 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expa
     random.seed(42)
     default_genes = random.sample(SEL.index.to_list(), 16)
     
-    SEL_GENES = st.multiselect(
-        "Select genes (default: 16 random genes)", 
-        options=SEL.index, 
-        default=default_genes,  # Pre-select 16 random genes
-        key="select_a_gene"
-    )
+    trend_container = st.container()
+    #ALL = st.checkbox("Select all")
+    SEL_MODE = st.segmented_control("Selection mode", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
 
+        
+    if SEL_MODE == 'Random':
+        SEL_GENES = trend_container.multiselect(
+            f"Selected genes ({SEL_MODE})", 
+            options=SEL.index, 
+            default=default_genes,  # Pre-select 16 random genes
+            key="select_a_gene"
+        )
+    else:
+        SEL_GENES = trend_container.multiselect(
+            f"Selected genes ({SEL_MODE})", 
+            options=SEL.index, 
+            key="select_a_gene"
+        )
     
 
     if SEL_GENES:

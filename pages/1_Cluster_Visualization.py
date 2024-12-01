@@ -416,31 +416,30 @@ def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
 #--------------------------------------------------------------
 with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expanded=True):
     st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
+    
     # Randomly select 16 genes as default
     
     random.seed(42)
     default_genes = random.sample(SEL.index.to_list(), 16)
     
     trend_container = st.container()
-    #ALL = st.checkbox("Select all")
-    SEL_MODE = st.segmented_control("Selection mode", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
-
-        
-    if SEL_MODE == 'Random':
-        SEL_GENES = trend_container.multiselect(
-            f"Selected genes ({SEL_MODE})", 
-            options=SEL.index, 
-            default=default_genes,  # Pre-select 16 random genes
-            key="select_a_gene"
-        )
-    else:
-        SEL_GENES = trend_container.multiselect(
-            f"Selected genes ({SEL_MODE})", 
-            options=SEL.index, 
-            key="select_a_gene"
-        )
     
+    
+    
+    SEL_MODE = trend_container.segmented_control("Selection mode", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
 
+
+    if SEL_MODE == 'Random':
+            SEL_GENES = default_genes
+            
+    else:
+            SEL_GENES = trend_container.multiselect(
+                f"Selected genes ({SEL_MODE})", 
+                options=SEL.index, 
+                key="select_a_gene",
+                placeholder="Select genes in the cluster...",
+            )
+    
     if SEL_GENES:
         FPKM = SEL.filter(FPKM_features)
         fig = plot_gene_trend(np.log2(FPKM+1), SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB="log2(FPKM+1)")

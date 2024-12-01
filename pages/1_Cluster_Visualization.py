@@ -66,13 +66,13 @@ with st.sidebar:
         if gene_query and gene_query != "":  # Ignore empty selection
             new_k = DATA.loc[gene_query, 'Cluster']
             
-            CC = st.columns(2)
+            CC = st.columns(2, vertical_alignment="center")
             with CC[0]:
                 st.write(f"Go to Cluster {new_k}")
             
             # Button to update the cluster and clear the gene query
             with CC[1]:
-                st.button(":material/arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
+                st.button(":material/keyboard_arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
         
 
 
@@ -83,44 +83,46 @@ with st.sidebar:
     
 
 
+with st.expander("Clusters categories Maps", expanded=True):
+    #st.markdown("<h1 style='text-align: center;'>Clusters composition</h1>", unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center;'>Clusters composition</h1>", unsafe_allow_html=True)
+    C = st.columns(2, gap="large")
 
-C = st.columns(2, gap="large")
+    # Cluster composition file viewers
+    CV_file = f"./data/plots/Clusters_CV.pdf"
+    Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
 
-# Cluster composition file viewers
-CV_file = f"./data/plots/Clusters_CV.pdf"
-Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
+    with C[0]:
+        pdf_viewer(CV_file, key="CV_pdf")
+        try:
+            with open(CV_file, "rb") as CV_file_pdf:
+                CV_data = CV_file_pdf.read()
+            st.download_button(
+                label="",
+                key="download_CV",
+                icon=":material/download:",
+                data=CV_data,
+                file_name="CV_Categories_Clusters_Intersection.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("File not found.")
 
-with C[0]:
-    pdf_viewer(CV_file)
-    try:
-        with open(CV_file, "rb") as pdf_file:
-            CV_data = pdf_file.read()
-        st.download_button(
-            label="",
-            icon=":material/download:",
-            data=CV_data,
-            file_name="CV_Categories_Clusters_Intersection.pdf",
-            mime="application/pdf",
-        )
-    except FileNotFoundError:
-        st.error("File not found.")
-
-with C[1]:
-    pdf_viewer(Gonzalez_file)
-    try:
-        with open(Gonzalez_file, "rb") as pdf_file:
-            Gonzalez_data = pdf_file.read()
-        st.download_button(
-            label="",
-            icon=":material/download:",
-            data=Gonzalez_data,
-            file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
-            mime="application/pdf",
-        )
-    except FileNotFoundError:
-        st.error("File not found.")
+    with C[1]:
+        pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
+        try:
+            with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
+                Gonzalez_data = Gonzalez_file_pdf.read()
+            st.download_button(
+                label="",
+                key="download_Gonzalez",
+                icon=":material/download:",
+                data=Gonzalez_data,
+                file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("File not found.")
 
 # --------------------------------------------------------------
 st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
@@ -174,12 +176,13 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
     # Update layout for stacked bar
     fig.update_layout(
         barmode="stack",
-        title="Cluster composition in term of categories",
+        title="",
         xaxis=dict(title="# of genes"),
         yaxis=dict(title="", showticklabels=False),
         plot_bgcolor="white",
-        showlegend=False  # Hide the legend
-
+        showlegend=False,  # Hide the legend
+        height=300,  # Set a fixed height
+        width=900,  # Set a fixed width
     )
     # Remove duplicate legend entries (if categories repeat across features)
 
@@ -188,9 +191,31 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
 
 
 
+
+def plot_frame(border_color="#FFFFFF"):
+    PLOT_BGCOLOR = border_color
+
+    st.markdown(
+        f"""
+        <style>
+        .stPlotlyChart {{
+        outline: 1px solid {PLOT_BGCOLOR};
+        border-radius: 4px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.20), 0 3px 10px 0 rgba(0, 0, 0, 0.30);
+        }}
+        </style>
+        """, unsafe_allow_html=True
+)
+
+
+
 C= st.columns(3)
 with C[0]:
     bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
+    
+    #plot_frame()
+    
+    
     st.plotly_chart(bar_comp, use_container_width=True)
 
 
@@ -254,22 +279,9 @@ with C[1]:
 SEL = DATA[DATA['Cluster'] == k]
 
 
-#--------------------------------------------------------------
-with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expanded=True):
-    st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
-    # Randomly select 16 genes as default
-    
-    random.seed(42)
-    default_genes = random.sample(SEL.index.to_list(), 16)
-    
-    SEL_GENES = st.multiselect(
-        "Select genes (default: 16 random genes)", 
-        options=SEL.index, 
-        default=default_genes,  # Pre-select 16 random genes
-        key="select_a_gene"
-    )
 
-    def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
+
+def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
         """
         Plot trends for selected genes across conditions with arrow connections between average points.
         
@@ -374,6 +386,20 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expa
                 ticktext=[0, y_max],
             )
 
+
+            # Add a horizontal line at y_max
+            fig.add_shape(
+                type="line",
+                x0=0,
+                x1=len(CT_LIST),  # Covers the entire x-axis range
+                y0=y_max,
+                y1=y_max,
+                xref=f"x{i + 1}",  # Reference the current subplot's x-axis
+                yref=f"y{i + 1}",  # Reference the current subplot's y-axis
+                line=dict(color="grey", width=0.5, ),  # Style of the line
+                row=row,
+                col=col,
+)
         # Update figure layout
         fig.update_layout(
             height=300 * grid_size, width=300 * grid_size,
@@ -383,6 +409,26 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expa
         )
 
         return fig
+    
+    
+    
+    
+#--------------------------------------------------------------
+with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expanded=True):
+    st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
+    # Randomly select 16 genes as default
+    
+    random.seed(42)
+    default_genes = random.sample(SEL.index.to_list(), 16)
+    
+    SEL_GENES = st.multiselect(
+        "Select genes (default: 16 random genes)", 
+        options=SEL.index, 
+        default=default_genes,  # Pre-select 16 random genes
+        key="select_a_gene"
+    )
+
+    
 
     if SEL_GENES:
         FPKM = SEL.filter(FPKM_features)

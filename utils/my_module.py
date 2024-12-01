@@ -182,7 +182,7 @@ def scatter(DATA, selected_feature,key, COLOR_DICTS=None):
         
     with st.popover("⚙️", ):
         point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key+'point_size')
-        point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=0.8, step=0.1, key=key+'point_opacity')
+        point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=0.9, step=0.1, key=key+'point_opacity')
         if not CAT:
             colormap = st.segmented_control("Select Colormap", ["Turbo", "Blues","viridis", "RdBu_r"], default= 'Turbo',selection_mode='single', key=key+'colormap')
             min_col, max_col = st.slider("Color Range (percentile)", min_value=1, max_value=99, value=(1,99), step=1, key=key+'min_max')

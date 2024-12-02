@@ -1,0 +1,14 @@
+[[pages]]
+path = "1_Clusters_Navigator.py"
+name = "Clusters Navigator"
+icon = ":material/explore:"
+
+[[pages]]
+path = "2_Latent_Space.py"
+name = "Latent Space"
+icon = ":material/scatter_plot:"
+
+[[pages]]
+path = "3_Data.py"
+name = "Data"
+icon = ":material/table_rows:"

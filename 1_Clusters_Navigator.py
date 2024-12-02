@@ -1,7 +1,7 @@
 from utils.my_module import *
 
-st.set_page_config(layout="wide", initial_sidebar_state="expanded", 
-                    page_icon=":material/search:")
+#st.set_page_config(layout="wide", initial_sidebar_state="expanded", 
+#                    page_icon=":material/search:",)
 
 # Define session state variables for `k` and `gene_query`
 if "k" not in st.session_state:
@@ -73,14 +73,11 @@ with st.sidebar:
             # Button to update the cluster and clear the gene query
             with CC[1]:
                 st.button(":material/keyboard_arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
-        
-
-
-
     
     download_genes_list(GENE_LIST, k, key="download_gene_list_1")
 
-    
+#--------------------------------------------------------------
+st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
 
 
 with st.expander("Clusters categories Maps", expanded=True):
@@ -125,7 +122,7 @@ with st.expander("Clusters categories Maps", expanded=True):
             st.error("File not found.")
 
 # --------------------------------------------------------------
-st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
+
 
 # Create layout for exploring clusters
 CC = st.columns(6, vertical_alignment="bottom", gap="large")
@@ -181,8 +178,8 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
         yaxis=dict(title="", showticklabels=False),
         plot_bgcolor="white",
         showlegend=False,  # Hide the legend
-        height=300,  # Set a fixed height
-        width=900,  # Set a fixed width
+        height=400,  # Set a fixed height
+        width=400,  # Set a fixed width
     )
     # Remove duplicate legend entries (if categories repeat across features)
 
@@ -209,7 +206,7 @@ def plot_frame(border_color="#FFFFFF"):
 
 
 
-C= st.columns(3)
+C= st.columns([1,3])
 with C[0]:
     bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
     
@@ -281,146 +278,133 @@ SEL = DATA[DATA['Cluster'] == k]
 
 
 
+import math
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
-        """
-        Plot trends for selected genes across conditions with arrow connections between average points.
-        
-        Parameters:
-            DATA (pd.DataFrame): DataFrame where rows are genes, columns are RNA counts.
-            SEL_GENES (list): List of gene names to plot.
-            CT_LIST (list): List of ordered conditions (e.g., ["ESC", "MES", "CP", "CM"]).
-            CT_COL_DICT (dict): Mapping of condition names to colors.
-            Y_LAB (str): Label for the Y-axis.
+    """
+    Plot trends for selected genes across conditions with arrow connections between average points.
+    
+    Parameters:
+        DATA (pd.DataFrame): DataFrame where rows are genes, columns are RNA counts.
+        SEL_GENES (list): List of gene names to plot.
+        CT_LIST (list): List of ordered conditions (e.g., ["ESC", "MES", "CP", "CM"]).
+        CT_COL_DICT (dict): Mapping of condition names to colors.
+        Y_LAB (str): Label for the Y-axis.
 
-        Returns:
-            Plotly figure with subplots for each gene's trend.
-        """
+    Returns:
+        Plotly figure with subplots for each gene's trend.
+    """
+    num_genes = len(SEL_GENES)
+    num_cols = 6  # Fixed number of columns
+    num_rows = math.ceil(num_genes / num_cols)  # Calculate number of rows based on the number of genes
 
+    # Create subplot figure
+    fig = make_subplots(
+        rows=num_rows, cols=num_cols,
+        subplot_titles=SEL_GENES,
+        horizontal_spacing=0.05, vertical_spacing=0.1,
+    )
 
-        num_genes = len(SEL_GENES)
-        grid_size = math.ceil(math.sqrt(num_genes))  # Create a square grid layout
+    for i, gene_name in enumerate(SEL_GENES):
+        # Extract gene data
+        gene_data = DATA.loc[gene_name]
 
-        # Create subplot figure
-        fig = make_subplots(
-            rows=grid_size, cols=grid_size,
-            subplot_titles=SEL_GENES,
-            horizontal_spacing=0.1, vertical_spacing=0.1,
-        )
+        # Extract condition (CT) and replicate (REP) information
+        CT = pd.Categorical(gene_data.index.str.extract(f"({'|'.join(CT_LIST)})")[0], categories=CT_LIST, ordered=True)
+        REP = gene_data.index.str.extract(r'(\d)')[0]
+        df = pd.DataFrame({Y_LAB: gene_data.values, 'CT': CT, 'REP': REP})
 
-        for i, gene_name in enumerate(SEL_GENES):
-            # Extract gene data
-            gene_data = DATA.loc[gene_name]
+        # Filter out invalid rows
+        df = df.dropna()
 
-            # Extract condition (CT) and replicate (REP) information
-            CT = pd.Categorical(gene_data.index.str.extract(f"({'|'.join(CT_LIST)})")[0], categories=CT_LIST, ordered=True)
-            REP = gene_data.index.str.extract(r'(\d)')[0]
-            df = pd.DataFrame({Y_LAB: gene_data.values, 'CT': CT, 'REP': REP})
+        # Compute average values for arrows
+        avg_df = df.groupby('CT', observed=False)[Y_LAB].mean().reset_index().sort_values('CT')
 
-            # Filter out invalid rows
-            df = df.dropna()
+        # Determine subplot location
+        row = (i // num_cols) + 1
+        col = (i % num_cols) + 1
 
-            # Compute average values for arrows
-            avg_df = df.groupby('CT', observed=False)[Y_LAB].mean().reset_index().sort_values('CT')
-
-            # Determine subplot location
-            row = (i // grid_size) + 1
-            col = (i % grid_size) + 1
-
-            # Add scatter plot for individual points
-            for ct in CT_LIST:
-                ct_data = df[df['CT'] == ct]
-                fig.add_trace(
-                    go.Scatter(
-                        x=ct_data['CT'],
-                        y=ct_data[Y_LAB],
-                        mode='markers',
-                        marker=dict(
-                            size=20,
-                            color=CT_COL_DICT[ct],
-                            #line=dict(color='silver', width=1)  # Gray outline
-                        ),
-                        name=ct,
-                        showlegend=False,  # Avoid duplicating legends
-                        hovertemplate=f"{ct}"
-                    ),
-                    row=row, col=col
-                )
-
-            # Add arrows between average points
-            for j in range(len(avg_df) - 1):
-                #fig.add_trace(
-                #    go.Scatter(
-                #        x=[avg_df.iloc[j]["CT"], avg_df.iloc[j + 1]["CT"]],
-                #        y=[avg_df.iloc[j][Y_LAB], avg_df.iloc[j + 1][Y_LAB]],
-                #        mode="lines+markers",
-                #        line=dict(color="black", width=1),  # Line appearance
-                #        marker=dict(size=1),  # Make points invisible
-                #        showlegend=False,
-                #    ),
-                #    row=row, col=col,
-                #)
-                fig.add_annotation(
-                    x=avg_df.iloc[j + 1]["CT"],
-                    y=avg_df.iloc[j + 1][Y_LAB],
-                    ax=avg_df.iloc[j]["CT"],
-                    ay=avg_df.iloc[j][Y_LAB],
-                    xref=f"x{i + 1}",
-                    yref=f"y{i + 1}",
-                    axref=f"x{i + 1}",
-                    ayref=f"y{i + 1}",
-                    arrowhead=5,
-                    arrowsize=2,
-                    arrowwidth=1,
-                    arrowcolor="grey",
-                    showarrow=True,
-                )
-
-            # Update subplot axes
-            y_max = math.ceil(df[Y_LAB].max() * 1.1)  # Determine max value with padding
-            fig.update_xaxes(title_text="", row=row, col=col, showticklabels=False)
-            fig.update_yaxes(
-                title_text=Y_LAB if col == 1 else "",
-                row=row, col=col,
-                range=[0, y_max],  # Limit range from 0 to max
-                tickvals=[0, y_max],  # Display only 0 and max
-                ticktext=[0, y_max],
+        # Add scatter plot for individual points
+        for ct in CT_LIST:
+            ct_data = df[df['CT'] == ct]
+            fig.add_trace(
+                go.Scatter(
+                    x=ct_data['CT'],
+                    y=ct_data[Y_LAB],
+                    mode='markers',
+                    marker=dict(size=12, color=CT_COL_DICT[ct]),
+                    name=ct,
+                    showlegend=False,
+                    hovertemplate=f"{ct}"
+                ),
+                row=row, col=col
             )
 
+        # Add arrows between average points
+        for j in range(len(avg_df) - 1):
+            fig.add_annotation(
+                x=avg_df.iloc[j + 1]["CT"],
+                y=avg_df.iloc[j + 1][Y_LAB],
+                ax=avg_df.iloc[j]["CT"],
+                ay=avg_df.iloc[j][Y_LAB],
+                xref=f"x{i + 1}",
+                yref=f"y{i + 1}",
+                axref=f"x{i + 1}",
+                ayref=f"y{i + 1}",
+                arrowhead=5,
+                arrowsize=2,
+                arrowwidth=1,
+                arrowcolor="grey",
+                showarrow=True,
+            )
 
-            # Add a horizontal line at y_max
-            fig.add_shape(
-                type="line",
-                x0=0,
-                x1=len(CT_LIST),  # Covers the entire x-axis range
-                y0=y_max,
-                y1=y_max,
-                xref=f"x{i + 1}",  # Reference the current subplot's x-axis
-                yref=f"y{i + 1}",  # Reference the current subplot's y-axis
-                line=dict(color="grey", width=0.5, ),  # Style of the line
-                row=row,
-                col=col,
-)
-        # Update figure layout
-        fig.update_layout(
-            height=300 * grid_size, width=300 * grid_size,
-            title_text=None,
-            showlegend=False,
-            plot_bgcolor="white",
+        # Update subplot axes
+        y_max = math.ceil(df[Y_LAB].max() * 1.1)  # Determine max value with padding
+        fig.update_xaxes(title_text="", row=row, col=col, showticklabels=False)
+        fig.update_yaxes(
+            title_text=Y_LAB if col == 1 else "",
+            row=row, col=col,
+            range=[0, y_max],  # Limit range from 0 to max
+            tickvals=[0, y_max],  # Display only 0 and max
+            ticktext=[0, y_max],
         )
 
-        return fig
-    
-    
-    
+        # Add a horizontal line at y_max
+        fig.add_shape(
+            type="line",
+            x0=0,
+            x1=len(CT_LIST),  # Covers the entire x-axis range
+            y0=y_max,
+            y1=y_max,
+            xref=f"x{i + 1}",
+            yref=f"y{i + 1}",
+            line=dict(color="grey", width=0.5),
+            row=row,
+            col=col,
+        )
+
+    # Update figure layout
+    fig.update_layout(
+        height=100+(200 * num_rows), width=300 * num_cols,
+        title_text=None,
+        showlegend=False,
+        plot_bgcolor="white",
+    )
+
+    return fig
+
     
 #--------------------------------------------------------------
-with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expanded=True):
+with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expanded=True):
     st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
     
     # Randomly select 16 genes as default
     
     random.seed(42)
-    default_genes = random.sample(SEL.index.to_list(), 16)
+    default_genes = random.sample(SEL.index.to_list(), 18)
     
     trend_container = st.container()
     
@@ -448,7 +432,7 @@ with st.expander("Gene Expression Dynamics", icon=":material/trending_up:", expa
 
 
 #--------------------------------------------------------------
-with st.expander("Cluster Data Table", icon=":material/table_chart:"):
+with st.expander("Cluster Data Table", icon=":material/table_rows:"):
     df_tabs(SEL)
     download_genes_list(GENE_LIST, k, key="download_gene_list_2")
     

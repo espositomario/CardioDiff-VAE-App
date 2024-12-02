@@ -1,4 +1,8 @@
 [[pages]]
+path = "0_About.py"
+name = "About"
+
+[[pages]]
 path = "1_Clusters_Navigator.py"
 name = "Clusters Navigator"
 icon = ":material/explore:"

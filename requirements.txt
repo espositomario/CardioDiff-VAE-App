@@ -5,3 +5,4 @@ streamlit-pdf-viewer
 streamlit-extras
 streamlit-searchbox
 st-pages
+matplotlib

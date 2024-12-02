@@ -175,60 +175,7 @@ def df_tabs(DF):
                     help="This table contains RNA-seq FPKM (Fragments Per Kilobase of transcript per Million mapped reads) values for gene expression across different cell types.")
         st.dataframe(filter_dataframe(FPKM))
 
-def scatter(DATA, selected_feature,key, COLOR_DICTS=None):
-    CAT = False
-    if pd.api.types.is_categorical_dtype(DATA[selected_feature]) or DATA[selected_feature].dtype == 'object':
-        CAT = True
-        color_dict = COLOR_DICTS.get(selected_feature, None)
-        
-    with st.popover("⚙️", ):
-        point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key+'point_size')
-        point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=0.9, step=0.1, key=key+'point_opacity')
-        if not CAT:
-            colormap = st.segmented_control("Select Colormap", ["Turbo", "Blues","viridis", "RdBu_r"], default= 'Turbo',selection_mode='single', key=key+'colormap')
-            min_col, max_col = st.slider("Color Range (percentile)", min_value=1, max_value=99, value=(1,99), step=1, key=key+'min_max')
 
-    # Determine if the selected feature is categorical or continuous
-    if CAT:
-        # Handle categorical feature
-        fig = px.scatter(
-            DATA,
-            x="VAE_UMAP1",
-            y="VAE_UMAP2",
-            color=selected_feature,
-            hover_data=[DATA.index, "Cluster", selected_feature],
-            title=f"{selected_feature}",
-            labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
-            color_discrete_map=color_dict if color_dict else None
-        )
-    else:
-        # Handle continuous feature
-        # Compute 1st and 99th percentiles for color scaling
-        
-
-        min_p, max_p = np.percentile(DATA[selected_feature], [min_col, max_col])
-        fig = px.scatter(
-            DATA,
-            x="VAE_UMAP1",
-            y="VAE_UMAP2",
-            color=selected_feature,
-            hover_data=[DATA.index, "Cluster", selected_feature],
-            title=f"{selected_feature}",
-            labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
-            color_continuous_scale=colormap,
-            range_color=(min_p, max_p),  # Apply percentile scaling
-        )
-    
-    
-    
-    fig.update_traces(marker=dict(size=point_size, opacity=point_opacity))
-
-    fig.update_layout(
-        xaxis_showgrid=False, yaxis_showgrid=False,
-        xaxis_tickvals=[], yaxis_tickvals=[],
-        plot_bgcolor="white", autosize=True
-    )
-    return fig
 
 
 
@@ -255,7 +202,7 @@ Z_AVG_features = ['RNA_ESC', 'RNA_MES', 'RNA_CP', 'RNA_CM', 'H3K4me3_ESC', 'H3K4
 LOG_FC_features = ['RNA_CM_CP_FC', 'RNA_CM_MES_FC', 'RNA_CM_ESC_FC',
             'RNA_CP_MES_FC', 'RNA_CP_ESC_FC', 'RNA_MES_ESC_FC']
 
-MISC_features = [ 'VAE_RMSE', 'VAE_Sc', 'RNA_CV', 'CV_Category', 'ESC_ChromState_Gonzalez2021', 'Cluster']
+MISC_features = [ 'Cluster','RNA_CV', 'CV_Category', 'ESC_ChromState_Gonzalez2021', 'VAE_RMSE', 'VAE_Sc']
 
 LATENT_features = ['VAE1', 'VAE2', 'VAE3', 'VAE4', 'VAE5', 'VAE6', 'VAE_UMAP1', 'VAE_UMAP2']
 

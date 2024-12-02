@@ -173,12 +173,13 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
     # Update layout for stacked bar
     fig.update_layout(
         barmode="stack",
-        title="",
+        title=None,  # Remove the title
+        margin=dict(t=0),  # Remove the top margin to eliminate space
         xaxis=dict(title="# of genes"),
         yaxis=dict(title="", showticklabels=False),
         plot_bgcolor="white",
         showlegend=False,  # Hide the legend
-        height=400,  # Set a fixed height
+        height=250,  # Set a fixed height
         width=400,  # Set a fixed width
     )
     # Remove duplicate legend entries (if categories repeat across features)

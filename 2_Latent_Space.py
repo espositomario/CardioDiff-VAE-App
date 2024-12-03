@@ -75,7 +75,8 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_inde
         title=f"{selected_feature}",
         labels={"VAE_UMAP1": "UMAP1", "VAE_UMAP2": "UMAP2"},
         color_discrete_map=color_dict if CAT and color_dict else None,
-        color_continuous_scale=colormap if not CAT else None
+        color_continuous_scale=colormap if not CAT else None,
+        range_color=[min_p, max_p] if not CAT else None,
     )
     fig.update_traces(marker=dict(size=point_size, opacity=point_opacity))
 

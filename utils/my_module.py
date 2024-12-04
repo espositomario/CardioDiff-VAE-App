@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
+import re
 from plotly.graph_objects import Figure, Violin
 import plotly.graph_objects as go
 #custom components
@@ -90,7 +91,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     modification_container = st.container()
 
     with modification_container:
-        to_filter_columns = st.multiselect("Select columns by which filter genes", df.columns)
+        to_filter_columns = st.multiselect("Select one or multiple column conditions by which filter data", df.columns)
         for column in to_filter_columns:
             left, right = st.columns((1, 20))
             left.write("↳")
@@ -216,17 +217,179 @@ COLOR_FEATURES = MISC_features + Z_AVG_features + LOG_FC_features
 
 
 
-def bottom_cluster():
 
-    with bottom():
-        # Create two columns for layout
-        # Input field for selecting k (from 0 to 79)
-        k = st.number_input(label="Select a Cluster (from 0 to 79)"
-                            , min_value=0, max_value=79, step=1, value=76, placeholder="Enter a number between 0 and 79")
+def plot_sankey(DATA, SEL_GENES, font_size=12, font_color="black", link_opacity=0.5):
+    """
+    Create a Sankey diagram with genes as the first layer and clusters as the second.
+    Links between genes and clusters are colored based on clusters.
 
-        NUM_OF_GENES = GENE_CLUSTERS[str(k)]['len']
-        GENE_LIST = GENE_CLUSTERS[str(k)]['gene_list']
+    Parameters:
+    - DATA (pd.DataFrame): Input data with genes as index.
+    - SEL_GENES (list): List of selected gene names.
+    - font_size (int): Font size for node labels.
+    - font_color (str): Font color for node labels.
+    - font_family (str): Font family for node labels.
+    - link_opacity (float): Opacity for the links (0.0 to 1.0).
 
-            
-            
+    Returns:
+    - fig: A Plotly Sankey figure.
+    """
+    # Filter for selected genes
+    data_filtered = DATA.loc[SEL_GENES]
 
+    # Create node labels
+    gene_nodes = SEL_GENES  # Gene names as the first level
+    cluster_nodes = data_filtered["Cluster"].unique().tolist()  # Clusters as the second level
+    
+    all_nodes = gene_nodes + cluster_nodes  # Combine all nodes
+    node_map = {node: i for i, node in enumerate(all_nodes)}  # Map node name to index
+
+    # Generate a colormap for clusters
+    num_clusters = len(cluster_nodes)
+    cmap = cm.get_cmap("rainbow", num_clusters)  # Use rainbow colormap
+    cluster_colors = {cluster: mcolors.rgb2hex(cmap(i)) for i, cluster in enumerate(cluster_nodes)}
+
+    # Create links
+    links = []
+    link_colors = []
+
+    # Links from genes to clusters
+    for gene, row in data_filtered.iterrows():
+        cluster = row["Cluster"]
+        rgba_color = mcolors.to_rgba(cluster_colors[cluster], alpha=link_opacity)  # Convert hex to RGBA
+        rgba_str = f"rgba({int(rgba_color[0]*255)}, {int(rgba_color[1]*255)}, {int(rgba_color[2]*255)}, {rgba_color[3]})"
+        links.append({
+            "source": node_map[gene],
+            "target": node_map[cluster],
+            "value": 1  # Equal weight for all links
+        })
+        link_colors.append(rgba_str)
+
+    # Define node colors
+    node_colors = []
+    for node in all_nodes:
+        if node in gene_nodes:  # Gene nodes
+            node_colors.append("silver")  # Default gray for genes
+        else:  # Cluster nodes
+            node_colors.append(cluster_colors[node])  # Color by cluster
+
+    # Create Sankey diagram
+    fig = go.Figure(go.Sankey(
+        textfont=dict(size=font_size, color=font_color),
+        #arrangement = "freeform",
+        node=dict(
+            pad=10,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=all_nodes,
+            x=nodes_xy(len(gene_nodes), len(cluster_nodes))[0],
+            y=nodes_xy(len(gene_nodes), len(cluster_nodes))[1],
+            color=node_colors,
+            hovertemplate='%{label}<extra></extra>',
+        ),
+        link=dict(
+            source=[link["source"] for link in links],
+            target=[link["target"] for link in links],
+            value=[link["value"] for link in links],
+            color=link_colors,  # Colored links based on clusters
+            hovertemplate='Gene: %{source.label}<br>Cluster: %{target.label}<extra></extra>',
+        )
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title_text="",
+        margin=dict(t=50, l=50, r=25, b=25),
+        height=  min(70+ (len(gene_nodes) * 20), 1000) # Set a fixed height
+
+    )
+    
+    return fig
+
+
+
+def nodes_xy(len_gene_nodes, len_cluster_nodes):
+    """
+    Generate x and y positions for Sankey nodes.
+
+    Parameters:
+    - len_gene_nodes (int): Number of gene nodes.
+    - len_cluster_nodes (int): Number of cluster nodes.
+
+    Returns:
+    - x (list): x positions for all nodes.
+    - y (list): y positions for all nodes.
+    """
+    if len_gene_nodes < 2 or len_cluster_nodes < 2:
+        return None, None
+
+    # x positions: fixed for gene nodes and varying for cluster nodes
+    x_gene = [None] * len_gene_nodes
+    x_cluster = list(np.linspace(0.3, 0.8, len_cluster_nodes))
+
+    # y positions: linearly spaced from 0 to 1
+    y_gene = [None] * len_gene_nodes
+    y_cluster = list(np.linspace(0.1, 0.95, len_cluster_nodes))
+
+    # Combine x and y positions
+    x = x_gene + x_cluster
+    y = y_gene + y_cluster
+
+    return x, y
+
+
+
+def parse_gene_list(uploaded_files):
+    """
+    Parse uploaded files to extract a list of genes.
+
+    Parameters:
+    - uploaded_files: List of uploaded file objects.
+
+    Returns:
+    - list: A deduplicated list of gene names.
+    """
+    gene_list = []
+    for file in uploaded_files:
+        content = file.read().decode("utf-8")
+        # Split content using common delimiters
+        genes = re.split(r'[,\t\n\s]+', content)
+        gene_list.extend(gene.strip() for gene in genes if gene.strip())  # Remove empty or whitespace-only entries
+    return list(set(gene_list))  # Deduplicate the list
+
+
+def select_genes():
+    SEL_GENES = []
+    # Segmented control to choose between manual selection or file upload
+    selection_mode = st.segmented_control(
+        " ",label_visibility="collapsed",
+        options=["Select manually", "Upload files"],
+    )
+
+    if selection_mode == "Upload files":
+        # Upload gene list files
+        uploaded_files = st.file_uploader(
+            "Upload one or multilpe files containing gene symbols", 
+            help="- Files must be UTF-8 encoded text files with gene symbols separeted by commas, tabs, spaces or newlines. \n - Gene symbols must be in RefSeq mouse format (e.g., 'Hand1'). \n - Multiple files will be merged into a single gene list. \n - Gene symbols not found in the dataset will be ignored.",
+            accept_multiple_files=True
+        )
+
+        # Parse 
+        if uploaded_files:
+            try:
+                file_genes = parse_gene_list(uploaded_files)
+                
+                SEL_GENES = [gene for gene in file_genes if gene in DATA.index]
+            except Exception as e:
+                st.error(f"Error reading files: {e}")
+
+    elif selection_mode == "Select manually":
+        # Multi-select widget for gene selection
+        SEL_GENES = st.multiselect(
+            "Selected genes",
+            options=DATA.index,
+            placeholder="Type or click to select genes",
+            key="select_genes"
+        )
+ 
+    return SEL_GENES

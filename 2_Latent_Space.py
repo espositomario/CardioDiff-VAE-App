@@ -1,18 +1,31 @@
 from utils.my_module import *
-#st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("<h1 style='text-align: center;'>Gene encoded in the VAE Latent Space</h1>", unsafe_allow_html=True)
 
 
 
-SEL_GENES= st.multiselect("Select genes to highlight", options=DATA.index, 
-                max_selections=20,
-                key="select a gene")
+with st.expander("Highlight genes in the scatter plot", icon=":material/checklist:"):
+    SHOW_LABELS  = False
+    SEL_GENES_SIZE = 16
+    LABEL_SIZE = 12
+    C = st.columns([4,1])
+    
+
+    SEL_GENES = select_genes()
+
+    with st.popover("", icon=":material/settings:"):
+        if SEL_GENES: 
+ 
+            SHOW_LABELS = st.checkbox("Show gene labels", value=True)
+
+            SEL_GENES_SIZE = st.slider("Point size", min_value=8, max_value=24, value=16, step=2)
+
+            if SHOW_LABELS: LABEL_SIZE = st.slider("Label size", min_value=8, max_value=20, value=12, step=2)
 
 
 
-
-def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_index=0):
+def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_index=0, 
+            LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12):
     import plotly.graph_objects as go
 
     # Layout for control elements
@@ -90,7 +103,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_inde
                     x=[gene_data["VAE_UMAP1"]],
                     y=[gene_data["VAE_UMAP2"]],
                     mode="markers",
-                    marker=dict(size=16, color=gene_color, line=dict(width=1, color="grey")),
+                    marker=dict(size=SEL_GENES_SIZE, color=gene_color, line=dict(width=1, color="black")),
                     showlegend=False,  # Avoid duplicate legend entries
                     hovertemplate=(
                         f"<b>Gene:</b> {gene}<br>"
@@ -102,21 +115,22 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_inde
                     hoverlabel=dict(bgcolor="red", font=dict(color="white"))  # Red hover background
                 ))
 
-                # Add annotation for the gene name with a white background
-                fig.add_annotation(
-                    x=gene_data["VAE_UMAP1"],
-                    y=gene_data["VAE_UMAP2"],
-                    text=gene,
-                    #showarrow=True,
-                    arrowsize=0.5,
-                    arrowcolor="grey",
-                    arrowhead=0,
-                    font=dict(size=14, color="black"),  # Text font
-                    bgcolor="white",  # Background color for the annotation
-                    #bordercolor="black",  # Optional: Add border to the annotation
-                    borderwidth=0,
-                    borderpad=0,
-                )
+                if LABELS:
+                    # Add annotation for the gene name with a white background
+                    fig.add_annotation(
+                        x=gene_data["VAE_UMAP1"],
+                        y=gene_data["VAE_UMAP2"],
+                        text=gene,
+                        #showarrow=True,
+                        arrowsize=0.5,
+                        arrowcolor="black",
+                        arrowhead=0,
+                        font=dict(size=LABEL_SIZE, color="black"),  # Text font
+                        bgcolor="white",  # Background color for the annotation
+                        #bordercolor="black",  # Optional: Add border to the annotation
+                        borderwidth=0,
+                        borderpad=0,
+                    )
 
 
     # Customize layout
@@ -146,7 +160,8 @@ C = st.columns(2,gap="large")
 with C[0]:    
     KEY1 = 'key1'
     
-    fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=SEL_GENES, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=1)
+    fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=SEL_GENES, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=1, 
+                    LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE)
     st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
 
@@ -155,7 +170,8 @@ with C[1]:
     KEY2 = 'key2'
     # Dropdown for feature selection
 
-    fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=SEL_GENES, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=2)
+    fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=SEL_GENES, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=2,
+                    LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE)
     st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
     
     

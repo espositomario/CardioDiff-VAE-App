@@ -14,6 +14,8 @@ from streamlit_extras.bottom_container import bottom
 from plotly.subplots import make_subplots
 import math
 from matplotlib import cm, colors as mcolors
+import matplotlib.pyplot as plt
+import seaborn as sns
 from pandas.api.types import (
     is_categorical_dtype,
     is_datetime64_any_dtype,
@@ -362,7 +364,7 @@ def select_genes():
     SEL_GENES = []
     # Segmented control to choose between manual selection or file upload
     selection_mode = st.segmented_control(
-        " ",label_visibility="collapsed",
+        "Select or Upload a gene list",
         options=["Select manually", "Upload files"],
     )
 
@@ -391,5 +393,92 @@ def select_genes():
             placeholder="Type or click to select genes",
             key="select_genes"
         )
- 
+
     return SEL_GENES
+
+
+def download_table(DATA):
+    """
+    Creates a button to download the provided DataFrame as a CSV file.
+
+    Parameters:
+    - DATA: pandas DataFrame to be downloaded.
+
+    Returns:
+    - None
+    """
+    # Convert the DataFrame to a CSV string
+    csv_data = DATA.to_csv(index=True, index_label="GeneSymbol")
+
+    # Create the download button
+    st.download_button(
+        label="All Data",
+        icon=":material/download:",  
+        data=csv_data,
+        file_name="CardioDiffVAE_data.csv",
+        mime="text/csv",  # Correct MIME type for CSV files
+        key='download_table'
+    )
+    
+
+
+
+def plot_violin_box(df, feature_group, ct_list, hm_col_dict, ct_col_dict, k=None, y_lab='', VMIN=None, VMAX=None):
+    """
+    Plots a violin and box plot for a single feature group.
+
+    Args:
+        df (pd.DataFrame): The data frame containing the data.
+        feature_group (str): The feature group to be plotted (e.g., 'H3K4me3').
+        ct_list (list of str): List of cell types for grouping (e.g., ['ESC', 'MES', 'CP', 'CM']).
+        hm_col_dict (dict): Dictionary mapping feature groups to colors.
+        ct_col_dict (dict): Dictionary mapping cell types to colors.
+        k (int, optional): Cluster value to filter the DataFrame by the 'Cluster' column.
+        y_lab (str): Label for the x-axis.
+    """
+
+
+
+    
+    # Melt the DataFrame to long format for plotting
+    melted_df = df.melt(var_name='CT', value_name='Value')
+    melted_df['CT'] = melted_df['CT'].str.replace(f"{feature_group}_", '')
+
+    # Create the plot
+    fig, ax = plt.subplots(figsize=(3, 4))
+
+    # Violin plot (not displayed as per requirements)
+    # sns.violinplot(data=melted_df, x='CT', y='Value', palette=[ct_col_dict[ct] for ct in ct_list],
+    #                ax=ax, inner=None, linewidth=0, saturation=1, cut=0, alpha=0.9)
+    
+    # Box plot overlay
+    sns.boxplot(
+        data=melted_df, x='CT', y='Value', palette=[ct_col_dict[ct] for ct in ct_list], 
+        ax=ax, width=0.6, saturation=0.8,
+        showcaps=False,
+        showfliers=False,
+        #boxprops=dict(facecolor='white', alpha=0.8, linewidth=1.5),
+        medianprops=dict(color='black', linewidth=1.5),
+        whiskerprops=dict(color='black', alpha=0.7),
+        #flierprops=dict(marker='o', markerfacecolor='grey', markersize=4, alpha=0.8)
+    )
+    # Scatter points overlay (jittered)
+    sns.stripplot(
+        data=melted_df, x='CT', y='Value', palette=[ct_col_dict[ct] for ct in ct_list], 
+        ax=ax, jitter=True, size=1, alpha=0.5, linewidth=0.5, 
+    )
+
+
+
+
+    # Customize plot
+    ax.set_title(f'{feature_group}', fontsize=14, color='white', backgroundcolor=hm_col_dict.get(feature_group, 'black'),
+                        pad=20)
+    ax.axhline(0, color='grey', linestyle='--', linewidth=1)  # Horizontal line at y=0
+    ax.set_ylim(VMIN, VMAX)  # Use global min and max for this feature group
+    ax.set_ylabel(y_lab, fontsize=12)
+    ax.set_xlabel('', )
+    sns.despine(ax=ax)
+
+    plt.tight_layout()
+    return fig, ax

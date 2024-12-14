@@ -1,28 +1,6 @@
 from utils.my_module import *
 
 
-def download_table(DATA):
-    """
-    Creates a button to download the provided DataFrame as a CSV file.
-
-    Parameters:
-    - DATA: pandas DataFrame to be downloaded.
-
-    Returns:
-    - None
-    """
-    # Convert the DataFrame to a CSV string
-    csv_data = DATA.to_csv(index=True, index_label="GeneSymbol")
-
-    # Create the download button
-    st.download_button(
-        label=" DataTable CSV",
-        icon=":material/download:",  
-        data=csv_data,
-        file_name="CardioDiffVAE_data.csv",
-        mime="text/csv",  # Correct MIME type for CSV files
-        key='download_table'
-    )
 
 
 with st.sidebar:
@@ -33,8 +11,8 @@ with st.sidebar:
 #-------------------Filter data by genes (rows)-------------------#
 st.markdown("<h3 style='text-align: center;'>Filter data by genes (rows)</h3>", unsafe_allow_html=True)
 
-with st.expander("Select or Upload a gene list"):
-    SEL_GENES = select_genes()
+#with st.expander("Select or Upload a gene list"):
+SEL_GENES = select_genes()
 # Plot Sankey diagram 
 if SEL_GENES:
     # filter DATA by sekected genes
@@ -48,8 +26,50 @@ if SEL_GENES:
 #-------------------Filter data by features (columns)-------------------#
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center;'>Filter data by features (columns)</h3>", unsafe_allow_html=True)
-
+#with st.expander("Select Features to display"):
 df_tabs(DATA)
 
 
+#-------------------Clusters composition-------------------#
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'>Genes distribution among clusters by categories</h3>", unsafe_allow_html=True)
 
+#with st.expander("Clusters categories Maps", expanded=True):
+
+C = st.columns(2, gap="large")
+
+# Cluster composition file viewers
+CV_file = f"./data/plots/Clusters_CV.pdf"
+Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
+
+with C[0]:
+    pdf_viewer(CV_file, key="CV_pdf")
+    try:
+        with open(CV_file, "rb") as CV_file_pdf:
+            CV_data = CV_file_pdf.read()
+        st.download_button(
+            label="",
+            key="download_CV",
+            icon=":material/download:",
+            data=CV_data,
+            file_name="CV_Categories_Clusters_Intersection.pdf",
+            mime="application/pdf",
+        )
+    except FileNotFoundError:
+        st.error("File not found.")
+
+with C[1]:
+    pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
+    try:
+        with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
+            Gonzalez_data = Gonzalez_file_pdf.read()
+        st.download_button(
+            label="",
+            key="download_Gonzalez",
+            icon=":material/download:",
+            data=Gonzalez_data,
+            file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
+            mime="application/pdf",
+        )
+    except FileNotFoundError:
+        st.error("File not found.")

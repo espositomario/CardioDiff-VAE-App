@@ -77,61 +77,14 @@ with st.sidebar:
     download_genes_list(GENE_LIST, k, key="download_gene_list_1")
 
 #--------------------------------------------------------------
-st.markdown("<h1 style='text-align: center;'>Explore clusters</h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
 
-
-with st.expander("Clusters categories Maps", expanded=True):
-    #st.markdown("<h1 style='text-align: center;'>Clusters composition</h1>", unsafe_allow_html=True)
-
-    C = st.columns(2, gap="large")
-
-    # Cluster composition file viewers
-    CV_file = f"./data/plots/Clusters_CV.pdf"
-    Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
-
-    with C[0]:
-        pdf_viewer(CV_file, key="CV_pdf")
-        try:
-            with open(CV_file, "rb") as CV_file_pdf:
-                CV_data = CV_file_pdf.read()
-            st.download_button(
-                label="",
-                key="download_CV",
-                icon=":material/download:",
-                data=CV_data,
-                file_name="CV_Categories_Clusters_Intersection.pdf",
-                mime="application/pdf",
-            )
-        except FileNotFoundError:
-            st.error("File not found.")
-
-    with C[1]:
-        pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
-        try:
-            with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
-                Gonzalez_data = Gonzalez_file_pdf.read()
-            st.download_button(
-                label="",
-                key="download_Gonzalez",
-                icon=":material/download:",
-                data=Gonzalez_data,
-                file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
-                mime="application/pdf",
-            )
-        except FileNotFoundError:
-            st.error("File not found.")
 
 # --------------------------------------------------------------
 
 
-# Create layout for exploring clusters
-CC = st.columns(6, vertical_alignment="bottom", gap="large")
-
-
-
 
 #--------------------------------------------------------------            
-st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
 
 
 
@@ -207,8 +160,35 @@ def plot_frame(border_color="#FFFFFF"):
 
 
 
-C= st.columns([1,3])
-with C[0]:
+#------------------------------------------FEatures distributions------------------------------------------#
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'>Features distributions</h3>", unsafe_allow_html=True,help="..")
+
+C = st.columns(4, gap="small")
+
+for i,feature in enumerate(['RNA', 'H3K4me3', 'H3K27ac', 'H3K27me3']):
+    FILT_DF = DATA[[f"{feature}_{ct}" for ct in CT_LIST]].copy()
+    VMIN, VMAX = FILT_DF.min().min(), FILT_DF.max().max()
+    VMIN = FILT_DF.quantile([0.001]).min(axis=1)[0.001]
+    VMAX = FILT_DF.quantile([0.999]).max(axis=1)[0.999]
+    
+    FILT_DF = FILT_DF[DATA['Cluster'] == k]
+    
+    with C[i]:
+        fig, ax= plot_violin_box(FILT_DF, feature, CT_LIST, HM_COL_DICT, CT_COL_DICT, k=k, y_lab='Z-score' if i==0 else'',
+                                    VMIN=VMIN, VMAX=VMAX)
+
+        st.pyplot(fig)
+
+
+    
+        
+#------------------------------------------TSS and Categories------------------------------------------#
+
+st.markdown("<hr>", unsafe_allow_html=True)
+C= st.columns([3,1])
+with C[1]:
+    st.markdown("<h3 style='text-align: center;'>Categories</h3>", unsafe_allow_html=True)
     bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
     
     #plot_frame()
@@ -218,14 +198,9 @@ with C[0]:
 
 
 
+with C[0]:
 
 
-
-
-
-C = st.columns(2, gap="large")
-with C[0]:    
-    
     # Define file paths
     tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
     ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
@@ -233,7 +208,7 @@ with C[0]:
 
     st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True,
                 help="Transcription Starting Site Metaplots.\n - target histone marks on the rows\n - cell types in columns\n - dashed lines represents the control")
-    pdf_viewer(tss_plot_pdf_file)
+    pdf_viewer(tss_plot_pdf_file, )
     try:
         with open(tss_plot_pdf_file, "rb") as pdf_file:
             tss_data = pdf_file.read()
@@ -247,42 +222,13 @@ with C[0]:
     except FileNotFoundError:
         st.error("TSS plot file not found.")
 
-
-with C[1]:
-
-    st.markdown("<h3 style='text-align: center;'>Term Enrichment</h3>", unsafe_allow_html=True)
-    if os.path.exists(ora_plot_pdf):
-        pdf_viewer(ora_plot_pdf)
-        with open(ora_plot_pdf, "rb") as pdf_file:
-            ora_data = pdf_file.read()
-        st.download_button(
-            label="",
-            icon=":material/download:",
-            data=ora_data,
-            file_name=f"C{k}_TermEnrichment.pdf",
-            mime="application/pdf",
-        )
-    else:
-        
-        st.markdown(
-        """
-        <div style="text-align: center; font-size: 16px;">
-            No significant term resulted (adj. p-value > 0.05)
-        </div>
-        """, 
-        unsafe_allow_html=True
-        )
+    
 
 
 SEL = DATA[DATA['Cluster'] == k]
 
 
 
-
-import math
-import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
     """
@@ -399,7 +345,7 @@ def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
 
     
 #--------------------------------------------------------------
-with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expanded=True):
+with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expanded=False):
     st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
     
     # Randomly select 16 genes as default
@@ -411,7 +357,7 @@ with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expande
     
     
     
-    SEL_MODE = trend_container.segmented_control("Selection mode", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
+    SEL_MODE = trend_container.segmented_control("Select genes", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
 
 
     if SEL_MODE == 'Random':
@@ -420,9 +366,10 @@ with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expande
     else:
             SEL_GENES = trend_container.multiselect(
                 f"Selected genes ({SEL_MODE})", 
+                label_visibility="collapsed",
                 options=SEL.index, 
                 key="select_a_gene",
-                placeholder="Select genes in the cluster...",
+                placeholder="Select genes belonging to the cluster",
             )
     
     if SEL_GENES:
@@ -431,9 +378,33 @@ with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expande
         st.plotly_chart(fig, use_container_width=True)
 
 
-
 #--------------------------------------------------------------
-with st.expander("Cluster Data Table", icon=":material/table_rows:"):
+with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=True):
+    st.markdown("<h3 style='text-align: center;'>Functional Term Enrichment Analysis</h3>", unsafe_allow_html=True)
+    if os.path.exists(ora_plot_pdf):
+        pdf_viewer(ora_plot_pdf)
+        with open(ora_plot_pdf, "rb") as pdf_file:
+            ora_data = pdf_file.read()
+        st.download_button(
+            label="",
+            icon=":material/download:",
+            data=ora_data,
+            file_name=f"C{k}_TermEnrichment.pdf",
+            mime="application/pdf",
+        )
+    else:
+        
+        st.markdown(
+        """
+        <div style="text-align: center; font-size: 16px;">
+            No significant term resulted (adj. p-value > 0.05)
+        </div>
+        """, 
+        unsafe_allow_html=True
+        )
+#--------------------------------------------------------------
+with st.expander("Cluster Data", icon=":material/table_rows:"):
     df_tabs(SEL)
-    download_genes_list(GENE_LIST, k, key="download_gene_list_2")
     
+
+

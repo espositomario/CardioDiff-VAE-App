@@ -1,6 +1,6 @@
 from utils.my_module import *
 
-    
+
 def download_table(DATA):
     """
     Creates a button to download the provided DataFrame as a CSV file.

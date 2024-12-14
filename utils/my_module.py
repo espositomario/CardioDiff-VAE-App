@@ -482,3 +482,76 @@ def plot_violin_box(df, feature_group, ct_list, hm_col_dict, ct_col_dict, k=None
 
     plt.tight_layout()
     return fig, ax
+
+
+
+def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
+    """
+    Plot stacked bar charts for multiple features in a single plot.
+
+    Parameters:
+    - DATA: pandas DataFrame containing the data.
+    - feature_columns: List of column names to plot.
+    - COLOR_DICTS: Dictionary where keys are column names and values are color dictionaries.
+    """
+    fig = go.Figure()
+
+    for col in feature_columns:
+        # Get value counts and corresponding colors
+        counts = DATA[col].value_counts().to_dict()
+        color_dict = COLOR_DICTS.get(col, {})  # Default to empty if no dict provided
+
+        # Sort counts by color_dict key order
+        sorted_categories = [key for key in color_dict.keys() if key in counts]
+        sorted_counts = {cat: counts[cat] for cat in sorted_categories}
+
+        # Add bars for each category in the column
+        for category in sorted_categories:
+            count = sorted_counts.get(category, 0)
+            fig.add_trace(
+                go.Bar(
+                    x=[count],  # Counts on x-axis
+                    y=[col],  # Feature name on y-axis
+                    orientation='h',  # Horizontal bar orientation
+                    marker_color=color_dict.get(category, color_dict.get("other", "grey")),
+                    hovertemplate=f"{category}: {count}<extra></extra>",  # Display category and count
+
+                    text=[category],  # Display the category name
+                    textposition="inside",  # Position text horizontally inside the bar
+                )
+            )
+    # Update layout for stacked bar
+    fig.update_layout(
+        barmode="stack",
+        title=None,  # Remove the title
+        margin=dict(t=0),  # Remove the top margin to eliminate space
+        xaxis=dict(title="# of genes"),
+        yaxis=dict(title="", showticklabels=False),
+        plot_bgcolor="white",
+        showlegend=False,  # Hide the legend
+        height=250,  # Set a fixed height
+        width=400,  # Set a fixed width
+    )
+    # Remove duplicate legend entries (if categories repeat across features)
+
+
+    return fig
+
+
+
+
+def plot_frame(border_color="#FFFFFF"):
+    PLOT_BGCOLOR = border_color
+
+    st.markdown(
+        f"""
+        <style>
+        .stPlotlyChart {{
+        outline: 1px solid {PLOT_BGCOLOR};
+        border-radius: 4px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.20), 0 3px 10px 0 rgba(0, 0, 0, 0.30);
+        }}
+        </style>
+        """, unsafe_allow_html=True
+)
+

@@ -18,7 +18,7 @@ if SEL_GENES:
     # filter DATA by sekected genes
     st.dataframe(DATA.loc[SEL_GENES])
     
-    
+    #h
     
     
     

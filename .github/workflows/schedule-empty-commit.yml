@@ -1,7 +1,5 @@
-name: cron-schedule-updater
+name: schedule-empty-commit
 on:
-  push:
-  workflow_dispatch:  # Enables manual trigger from GitHub UI
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 8 * * *'

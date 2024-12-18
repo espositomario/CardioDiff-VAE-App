@@ -144,11 +144,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 def df_tabs(DF):
     # Feature groups
-    Z_AVG = DF[Z_AVG_features]
-    LOG_FC = DF[LOG_FC_features]
-    MISC = DF[MISC_features]
-    LATENT = DF[LATENT_features]
-    FPKM = DF[FPKM_features]
+    Z_AVG =  DF[[col for col in Z_AVG_features if col in DF.columns]]
+    LOG_FC = DF[[col for col in LOG_FC_features if col in DF.columns]]
+    MISC =   DF[[col for col in MISC_features if col in DF.columns]]
+    LATENT = DF[[col for col in LATENT_features if col in DF.columns]]
+    FPKM =   DF[[col for col in FPKM_features if col in DF.columns]]
 
     # Create Streamlit tabs
     tabs = st.tabs(["Full table", "Features Z-scores", "RNA Log FCs", "Annotations", "VAE Latent Space", "RNA FPKMs"])

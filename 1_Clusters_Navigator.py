@@ -287,7 +287,8 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         )
 #--------------------------------------------------------------
 with st.expander("Information of the Cluster", icon=":material/table_rows:",expanded=st.session_state.expand_all):
-    df_tabs(SEL)
+    #SEL_ = SEL.drop(columns='Cluster')
+    df_tabs(SEL.drop(columns='Cluster'))
     
 
 

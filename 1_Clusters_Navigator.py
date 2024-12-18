@@ -40,7 +40,7 @@ with st.sidebar:
 
     # Cluster selector input
     k = st.number_input(
-        label="Cluster",
+        label="Select a Cluster (between 0 and 79)",
         min_value=0,
         max_value=79,
         step=1,
@@ -59,34 +59,29 @@ with st.sidebar:
             options=[""] + list(DATA.index),  # Empty string for no default selection
             format_func=lambda x: "Type a gene symbol..." if x == "" else x,
             help='Refseq Gene Symbol in Mouse',
-            key="gene_query",
+            key="gene_query_select",
         )
 
         # Check if a gene is selected
         if gene_query and gene_query != "":  # Ignore empty selection
             new_k = DATA.loc[gene_query, 'Cluster']
             
-            CC = st.columns(2, vertical_alignment="center")
-            with CC[0]:
-                st.write(f"Go to Cluster {new_k}")
-            
-            # Button to update the cluster and clear the gene query
-            with CC[1]:
-                st.button(":material/keyboard_arrow_right:", on_click=lambda: update_cluster_and_clear_query(new_k))
+            update_cluster_and_clear_query(new_k)
     
     download_genes_list(GENE_LIST, k, key="download_gene_list_1")
 
 #--------------------------------------------------------------
-st.markdown(f"<h1 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
-
-
+EXPANDED = False
 # --------------------------------------------------------------
 
-#-------------------Clusters composition-------------------#
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center;'>Genes distribution among clusters by categories</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Cluster Navigator</h1>", unsafe_allow_html=True,)
+st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in term of input features distributions, Metagene plots...</h5>", unsafe_allow_html=True,)
+                
 
-with st.expander("Clusters categories Maps", expanded=True):
+#-------------------Clusters composition-------------------#
+
+with st.expander("Clusters categories Maps",  icon=":material/stacked_bar_chart:", expanded=True):
+    st.markdown("<h3 style='text-align: center;'>Genes distribution among clusters by categories</h3>", unsafe_allow_html=True)
 
     C = st.columns(2, gap="large")
 
@@ -127,71 +122,68 @@ with st.expander("Clusters categories Maps", expanded=True):
             st.error("File not found.")
 
 
-
-#------------------------------------------FEatures distributions------------------------------------------#
 st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center;'>Features distributions</h3>", unsafe_allow_html=True,help="..")
 
-C = st.columns(4, gap="small")
+st.markdown(f"<h5 style='text-align: center;'>Select a cluster from the sidebar</h5>", unsafe_allow_html=True)   
+st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
 
-for i,feature in enumerate(['RNA', 'H3K4me3', 'H3K27ac', 'H3K27me3']):
-    FILT_DF = DATA[[f"{feature}_{ct}" for ct in CT_LIST]].copy()
-    VMIN, VMAX = FILT_DF.min().min(), FILT_DF.max().max()
-    VMIN = FILT_DF.quantile([0.001]).min(axis=1)[0.001]
-    VMAX = FILT_DF.quantile([0.999]).max(axis=1)[0.999]
-    
-    FILT_DF = FILT_DF[DATA['Cluster'] == k]
-    
-    with C[i]:
-        fig, ax= plot_violin_box(FILT_DF, feature, CT_LIST, HM_COL_DICT, CT_COL_DICT, y_lab='Z-score' if i==0 else'',
-                                    VMIN=VMIN, VMAX=VMAX)
+#------------------------------------------Features distributions------------------------------------------#
+with st.expander("Features distributions",  icon=":material/bar_chart:",expanded=True):
 
-        st.pyplot(fig)
+    st.markdown("<h3 style='text-align: center;'>Features distributions</h3>", unsafe_allow_html=True,help="..")
+
+    C = st.columns(4, gap="small")
+
+    for i,feature in enumerate(['RNA', 'H3K4me3', 'H3K27ac', 'H3K27me3']):
+        FILT_DF = DATA[[f"{feature}_{ct}" for ct in CT_LIST]].copy()
+        VMIN, VMAX = FILT_DF.min().min(), FILT_DF.max().max()
+        VMIN = FILT_DF.quantile([0.001]).min(axis=1)[0.001]
+        VMAX = FILT_DF.quantile([0.999]).max(axis=1)[0.999]
+        
+        FILT_DF = FILT_DF[DATA['Cluster'] == k]
+        
+        with C[i]:
+            fig, ax= plot_violin_box(FILT_DF, feature, CT_LIST, HM_COL_DICT, CT_COL_DICT, y_lab='Z-score' if i==0 else'',
+                                        VMIN=VMIN, VMAX=VMAX)
+
+            st.pyplot(fig)
 
 
 #------------------------------------------TSS and Categories------------------------------------------#
+with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=True):
 
-st.markdown("<hr>", unsafe_allow_html=True)
-C= st.columns([3,1])
-with C[1]:
-    st.markdown("<h3 style='text-align: center;'>Categories</h3>", unsafe_allow_html=True)
-    bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
-    
-    #plot_frame()
-    
-    
-    st.plotly_chart(bar_comp, use_container_width=True)
+    C= st.columns([3,1])
+    with C[1]:
+        st.markdown("<h3 style='text-align: center;'>Categories</h3>", unsafe_allow_html=True)
+        bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
 
+        st.plotly_chart(bar_comp, use_container_width=True)
+
+    with C[0]:
 
 
-with C[0]:
+        # Define file paths
+        tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
+        ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
 
 
-    # Define file paths
-    tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
-    ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
+        st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True,
+                    help="Transcription Starting Site Metaplots.\n - target histone marks on the rows\n - cell types in columns\n - dashed lines represents the control")
+        pdf_viewer(tss_plot_pdf_file, )
+        try:
+            with open(tss_plot_pdf_file, "rb") as pdf_file:
+                tss_data = pdf_file.read()
+            st.download_button(
+                label="",
+                icon=":material/download:",
+                data=tss_data,
+                file_name=f"C{k}_TSSPlot.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("TSS plot file not found.")
 
 
-    st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True,
-                help="Transcription Starting Site Metaplots.\n - target histone marks on the rows\n - cell types in columns\n - dashed lines represents the control")
-    pdf_viewer(tss_plot_pdf_file, )
-    try:
-        with open(tss_plot_pdf_file, "rb") as pdf_file:
-            tss_data = pdf_file.read()
-        st.download_button(
-            label="",
-            icon=":material/download:",
-            data=tss_data,
-            file_name=f"C{k}_TSSPlot.pdf",
-            mime="application/pdf",
-        )
-    except FileNotFoundError:
-        st.error("TSS plot file not found.")
-
-    
-
-
-SEL = DATA[DATA['Cluster'] == k]
 
 
 
@@ -309,22 +301,20 @@ def plot_gene_trend(DATA, SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB):
 
     return fig
 
-    
 #--------------------------------------------------------------
-with st.expander("Gene Expression Dynamics", icon=":material/timeline:", expanded=False):
-    st.markdown("<h3 style='text-align: center;'>Gene expression dynamics across differentiation</h3>", unsafe_allow_html=True)
+with st.expander("Expression of selected genes", icon=":material/timeline:", expanded=False):
+    st.markdown("<h3 style='text-align: center;'>Expression of selected genes </h3>", unsafe_allow_html=True)
     
     # Randomly select 16 genes as default
     
     random.seed(42)
+    SEL = DATA[DATA['Cluster'] == k]
+
     default_genes = random.sample(SEL.index.to_list(), 18)
     
     trend_container = st.container()
     
-    
-    
     SEL_MODE = trend_container.segmented_control("Select genes", [ "Random","Custom"], default= 'Random',selection_mode='single', key='sel_mode_gene_trends')
-
 
     if SEL_MODE == 'Random':
             SEL_GENES = default_genes
@@ -369,7 +359,7 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         unsafe_allow_html=True
         )
 #--------------------------------------------------------------
-with st.expander("Cluster Data", icon=":material/table_rows:"):
+with st.expander("Information of the Cluster", icon=":material/table_rows:"):
     df_tabs(SEL)
     
 

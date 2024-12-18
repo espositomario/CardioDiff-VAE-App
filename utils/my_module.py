@@ -147,10 +147,10 @@ def df_tabs(DF):
     FPKM = DF[FPKM_features]
 
     # Create Streamlit tabs
-    tabs = st.tabs(["Whole Table", "Features Z-scores", "RNA Log FCs", "Annotations", "VAE Latent Space", "RNA FPKMs"])
+    tabs = st.tabs(["Full table", "Features Z-scores", "RNA Log FCs", "Annotations", "VAE Latent Space", "RNA FPKMs"])
 
     with tabs[0]:  # All
-        st.markdown("### Whole Table", 
+        st.markdown("### Full table", 
                     help="This table contains all the input features, annotations, and other information for all genes.")
         st.dataframe(filter_dataframe(DF))
 

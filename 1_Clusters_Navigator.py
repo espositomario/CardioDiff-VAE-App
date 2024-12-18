@@ -34,10 +34,16 @@ def download_genes_list(GENE_LIST, k, key):
         key=key
     )
     
-    
+
+# Initialize the session state flag if not already done
+if 'expand_all' not in st.session_state:
+    st.session_state.expand_all = True  # Default to collapsed   
     
 with st.sidebar:
 
+    
+    
+    
     # Cluster selector input
     k = st.number_input(
         label="Select a Cluster (between 0 and 79)",
@@ -70,6 +76,14 @@ with st.sidebar:
     
     download_genes_list(GENE_LIST, k, key="download_gene_list_1")
 
+    #
+    C = st.columns(4, gap="small")
+    with C[0]:
+        if st.button("", icon=":material/expand:",):
+            st.session_state.expand_all = True  # Set to True to expand all
+    with C[1]:
+        if st.button("", icon=":material/compress:"):
+            st.session_state.expand_all = False  # Set to False to collapse all
 #--------------------------------------------------------------
 EXPANDED = False
 # --------------------------------------------------------------
@@ -79,7 +93,7 @@ st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in te
                 
 
 #-------------------Clusters composition-------------------#
-with st.expander("Clusters categories Maps",  icon=":material/stacked_bar_chart:", expanded=True):
+with st.expander("Clusters categories Maps",  icon=":material/stacked_bar_chart:", expanded=st.session_state.expand_all):
     st.markdown("<h3 style='text-align: center;'>Genes distribution among clusters by categories</h3>", unsafe_allow_html=True)
 
     C = st.columns(2, gap="large")
@@ -129,7 +143,7 @@ st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h
 #------------------------------------------Features distributions------------------------------------------#
 
 #------------------------------------------Features distributions------------------------------------------#
-with st.expander("Features distributions",  icon=":material/bar_chart:",expanded=True):
+with st.expander("Features distributions",  icon=":material/bar_chart:",expanded=st.session_state.expand_all):
     st.markdown("<h3 style='text-align: center;'>Features distributions</h3>", unsafe_allow_html=True,help="..")
 
     C = st.columns(4, gap="small")
@@ -176,7 +190,7 @@ with st.expander("Features distributions",  icon=":material/bar_chart:",expanded
 
 
 #------------------------------------------TSS and Categories------------------------------------------#
-with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=True):
+with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=st.session_state.expand_all):
 
     C= st.columns([3,1])
     with C[1]:
@@ -214,7 +228,7 @@ with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=True)
 
 
 #--------------------------------------------------------------
-with st.expander("Expression of selected genes", icon=":material/timeline:", expanded=False):
+with st.expander("Expression of selected genes", icon=":material/timeline:", expanded=st.session_state.expand_all):
     st.markdown("<h3 style='text-align: center;'>Expression of selected genes </h3>", unsafe_allow_html=True)
     
     # Randomly select 16 genes as default
@@ -248,7 +262,7 @@ with st.expander("Expression of selected genes", icon=":material/timeline:", exp
         plotly_download_pdf(fig, file_name=f"C{k}_GeneTrends.pdf")
 
 #--------------------------------------------------------------
-with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=True):
+with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=st.session_state.expand_all):
     st.markdown("<h3 style='text-align: center;'>Functional Term Enrichment Analysis</h3>", unsafe_allow_html=True)
     if os.path.exists(ora_plot_pdf):
         pdf_viewer(ora_plot_pdf)
@@ -272,7 +286,7 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         unsafe_allow_html=True
         )
 #--------------------------------------------------------------
-with st.expander("Information of the Cluster", icon=":material/table_rows:"):
+with st.expander("Information of the Cluster", icon=":material/table_rows:",expanded=st.session_state.expand_all):
     df_tabs(SEL)
     
 

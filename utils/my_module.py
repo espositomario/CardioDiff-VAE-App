@@ -555,3 +555,40 @@ def plot_frame(border_color="#FFFFFF"):
         """, unsafe_allow_html=True
 )
 
+
+
+def add_footer():
+    """
+    Adds a footer to the Streamlit app with the user's name, copyright notice,
+    and clickable GitHub and LinkedIn icons with proper inline size adjustments.
+    """
+    footer_content = """
+        <style>
+        .footer {
+            margin-top: 50px;
+            margin-bottom: 50px;
+            padding: 30px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #7d7c7c;
+            border-top: 1px solid #ddd;
+        }
+        .footer a {
+            color: #0366d6;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        </style>
+        <div class="footer">
+            <p>Mario Esposito, Enrique Blanco and Luciano Di Croce © 2024 | 
+                <a href="https://github.com/espositomario" target="_blank">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 20px; height: 20px; vertical-align: text-center;" />
+                </a>
+                <a href="https://linkedin.com/in/esposito-mario" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn Logo" style="width: 14px; height: 14px; vertical-align: text-center;" />
+                </a>
+            </p>
+        </div>
+    """
+    st.markdown(footer_content, unsafe_allow_html=True)
+    

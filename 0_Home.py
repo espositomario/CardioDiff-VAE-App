@@ -1,3 +1,3 @@
 from utils.my_module import *
 
-st.title("About")
+st.title("Home")

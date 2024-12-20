@@ -482,7 +482,7 @@ def download_table(DATA):
 
     # Create the download button
     st.download_button(
-        label="All Data",
+        label="Data (10MB)",
         icon=":material/download:",  
         data=csv_data,
         file_name="CardioDiffVAE_data.csv",
@@ -596,11 +596,12 @@ def plot_stacked_bar(DATA, feature_columns, COLOR_DICTS):
         title=None,  # Remove the title
         margin=dict(t=0),  # Remove the top margin to eliminate space
         xaxis=dict(title="# of genes"),
-        yaxis=dict(title="", showticklabels=False),
+        yaxis=dict(title="", showticklabels=True, tickvals=feature_columns, ticktext=['Chromatin State in ESC', 'Expression Peaks/Stable',]),
         plot_bgcolor="white",
         showlegend=False,  # Hide the legend
         height=250,  # Set a fixed height
         width=400,  # Set a fixed width
+
     )
     # Remove duplicate legend entries (if categories repeat across features)
 
@@ -894,3 +895,19 @@ def create_gene_set_plot(df, color_dict):
     )
 
     return fig
+
+def title_with_help(TITLE, help_text, help_width=0.1):
+    """Mostra contenuto con un popover di aiuto usando st.popover.
+
+    Args:
+        content: Elementi di Streamlit da mostrare.
+        help_text: Il testo da mostrare nel popover.
+        help_width: Larghezza della colonna di aiuto (relativa alle altre colonne).
+    """
+
+    C = st.columns([help_width,1, help_width], vertical_alignment="center")
+    with C[1]:
+        st.markdown(f"<h3 style='text-align: center;'>{TITLE}</h3>", unsafe_allow_html=True)
+    with C[2]:
+        with st.popover("", icon=':material/help:'):  # Usa st.popover
+            st.write(help_text)

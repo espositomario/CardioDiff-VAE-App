@@ -94,7 +94,8 @@ st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in te
 
 #-------------------Clusters composition-------------------#
 with st.expander("Clusters categories Maps",  icon=":material/stacked_bar_chart:", expanded=st.session_state.expand_all):
-    st.markdown("<h3 style='text-align: center;'>Genes distribution among clusters by categories</h3>", unsafe_allow_html=True)
+    
+    title_with_help('Genes distribution among clusters by categories', 'help_text')
 
     C = st.columns(2, gap="large")
 
@@ -144,7 +145,7 @@ st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h
 
 #------------------------------------------Features distributions------------------------------------------#
 with st.expander("Features distributions",  icon=":material/bar_chart:",expanded=st.session_state.expand_all):
-    st.markdown("<h3 style='text-align: center;'>Features distributions</h3>", unsafe_allow_html=True,help="..")
+    title_with_help('Features distributions', 'help_text')
 
     C = st.columns(4, gap="small")
 
@@ -191,46 +192,43 @@ with st.expander("Features distributions",  icon=":material/bar_chart:",expanded
 
 #------------------------------------------TSS and Categories------------------------------------------#
 with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=st.session_state.expand_all):
+    title_with_help('MetaGene Plots', 'help_text')
 
-    C= st.columns([3,1])
-    with C[1]:
-        st.markdown("<h3 style='text-align: center;'>Categories</h3>", unsafe_allow_html=True)
+    # Define file paths
+    tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
+    ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
+
+
+    pdf_viewer(tss_plot_pdf_file, )
+    try:
+        with open(tss_plot_pdf_file, "rb") as pdf_file:
+            tss_data = pdf_file.read()
+        st.download_button(
+            label="",
+            icon=":material/download:",
+            data=tss_data,
+            file_name=f"C{k}_TSSPlot.pdf",
+            mime="application/pdf",
+        )
+    except FileNotFoundError:
+        st.error("TSS plot file not found.")
+
+
+
+#------------------------------------------TSS and Categories------------------------------------------#
+with st.expander("Cluster categories",  icon=":material/stacked_bar_chart:", expanded=st.session_state.expand_all):
+        title_with_help('Categories proportions', 'help_text')
+
         bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
 
         st.plotly_chart(bar_comp, use_container_width=True)
 
-    with C[0]:
-
-
-        # Define file paths
-        tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
-        ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
-
-
-        st.markdown("<h3 style='text-align: center;'>TSS Plot</h3>", unsafe_allow_html=True,
-                    help="Transcription Starting Site Metaplots.\n - target histone marks on the rows\n - cell types in columns\n - dashed lines represents the control")
-        pdf_viewer(tss_plot_pdf_file, )
-        try:
-            with open(tss_plot_pdf_file, "rb") as pdf_file:
-                tss_data = pdf_file.read()
-            st.download_button(
-                label="",
-                icon=":material/download:",
-                data=tss_data,
-                file_name=f"C{k}_TSSPlot.pdf",
-                mime="application/pdf",
-            )
-        except FileNotFoundError:
-            st.error("TSS plot file not found.")
-
-
-
-
+        plotly_download_pdf(bar_comp, file_name=f"C{k}_CategoriesStackedBar.pdf")
 
 #--------------------------------------------------------------
 with st.expander("Expression of selected genes", icon=":material/timeline:", expanded=st.session_state.expand_all):
-    st.markdown("<h3 style='text-align: center;'>Expression of selected genes </h3>", unsafe_allow_html=True)
-    
+    title_with_help('Expression of selected genes', 'help_text')
+
     # Randomly select 16 genes as default
     
     random.seed(42)
@@ -263,8 +261,8 @@ with st.expander("Expression of selected genes", icon=":material/timeline:", exp
 
 #--------------------------------------------------------------
 with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=st.session_state.expand_all):
-    st.markdown("<h3 style='text-align: center;'>Functional Term Enrichment Analysis</h3>", unsafe_allow_html=True)
-    
+    title_with_help('Functional Term Enrichment Analysis', 'help_text')
+
     TOP5 = pd.read_csv("./data/TOP5_TermsPerCluster.csv", index_col=0)
     TOP5_FILT= TOP5[TOP5['Cluster']==k]
     
@@ -291,9 +289,13 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         )
 #--------------------------------------------------------------
 with st.expander("Information of the Cluster", icon=":material/table_rows:",expanded=st.session_state.expand_all):
-    #SEL_ = SEL.drop(columns='Cluster')
+    title_with_help('Information of the Cluster', 'help_text')
     df_tabs(SEL.drop(columns='Cluster'))
     
 
 
+
+
+        
+        
 add_footer()

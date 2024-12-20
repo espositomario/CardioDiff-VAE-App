@@ -37,7 +37,7 @@ def download_genes_list(GENE_LIST, k, key):
 
 # Initialize the session state flag if not already done
 if 'expand_all' not in st.session_state:
-    st.session_state.expand_all = True  # Default to collapsed   
+    st.session_state.expand_all = False  # Default to collapsed   
     
 with st.sidebar:
 
@@ -81,54 +81,60 @@ with st.sidebar:
     with C[1]:
         if st.button("", icon=":material/compress:"):
             st.session_state.expand_all = False  # Set to False to collapse all
-#--------------------------------------------------------------
-EXPANDED = False
+
 # --------------------------------------------------------------
 
 st.markdown("<h1 style='text-align: center;'>Cluster Navigator</h1>", unsafe_allow_html=True,)
 st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in term of input features distributions, Metagene plots...</h5>", unsafe_allow_html=True,)
-st.markdown("<hr>", unsafe_allow_html=True)
 
 #-------------------Clusters composition-------------------#
-title_with_help('Genes distribution among clusters by categories', 'help_text')
+with st.expander("Cluster categories Map",  icon=":material/stacked_bar_chart:",expanded=st.session_state.expand_all):
 
-C = st.columns(2, gap="large")
+    title_with_help('Genes distribution among clusters by categories', 'help_text')
 
-# Cluster composition file viewers
-CV_file = f"./data/plots/Clusters_CV.pdf"
-Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
+    C = st.columns(2)
 
-with C[0]:
-    pdf_viewer(CV_file, key="CV_pdf")
-    try:
-        with open(CV_file, "rb") as CV_file_pdf:
-            CV_data = CV_file_pdf.read()
-        st.download_button(
-            label="",
-            key="download_CV",
-            icon=":material/download:",
-            data=CV_data,
-            file_name="CV_Categories_Clusters_Intersection.pdf",
-            mime="application/pdf",
-        )
-    except FileNotFoundError:
-        st.error("File not found.")
+    # Cluster composition file viewers
+    CV_file = f"./data/plots/Clusters_CV.pdf"
+    Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
 
-with C[1]:
-    pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
-    try:
-        with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
-            Gonzalez_data = Gonzalez_file_pdf.read()
-        st.download_button(
-            label="",
-            key="download_Gonzalez",
-            icon=":material/download:",
-            data=Gonzalez_data,
-            file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
-            mime="application/pdf",
-        )
-    except FileNotFoundError:
-        st.error("File not found.")
+    with C[0]:
+
+        
+        image = convert_pdf_to_image(CV_file)
+        if image:
+            st.image(image, use_container_width=True)
+        try:
+            with open(CV_file, "rb") as CV_file_pdf:
+                CV_data = CV_file_pdf.read()
+            st.download_button(
+                label="",
+                key="download_CV",
+                icon=":material/download:",
+                data=CV_data,
+                file_name="CV_Categories_Clusters_Intersection.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("File not found.")
+
+    with C[1]:
+        image = convert_pdf_to_image(Gonzalez_file)
+        if image:
+            st.image(image, use_container_width=True)
+        try:
+            with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
+                Gonzalez_data = Gonzalez_file_pdf.read()
+            st.download_button(
+                label="",
+                key="download_Gonzalez",
+                icon=":material/download:",
+                data=Gonzalez_data,
+                file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
+                mime="application/pdf",
+            )
+        except FileNotFoundError:
+            st.error("File not found.")
 
 
 st.markdown("<hr>", unsafe_allow_html=True)
@@ -184,17 +190,19 @@ with st.expander("Features distributions",  icon=":material/bar_chart:",expanded
 
 
 
-
 #------------------------------------------TSS and Categories------------------------------------------#
-with st.expander("MetaGene plots",  icon=":material/area_chart:", expanded=st.session_state.expand_all):
+
+with st.expander("MetaGene plots", icon=":material/area_chart:", expanded=st.session_state.expand_all):
     title_with_help('MetaGene Plots', 'help_text')
 
-    # Define file paths
     tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
-    ora_plot_pdf = f"./data/plots/ORA/Cluster_{k}.pdf"
 
+    tss_plot = convert_pdf_to_image(tss_plot_pdf_file)
 
-    pdf_viewer(tss_plot_pdf_file, )
+    if tss_plot:
+        st.image(tss_plot, use_container_width=True)
+
+    # Add a download button for the PDF
     try:
         with open(tss_plot_pdf_file, "rb") as pdf_file:
             tss_data = pdf_file.read()
@@ -291,6 +299,8 @@ with st.expander("Information of the Cluster", icon=":material/table_rows:",expa
 
 
 
-        
-        
+
+    
+    
+
 add_footer()

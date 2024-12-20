@@ -8,3 +8,5 @@ st-pages
 matplotlib
 seaborn
 kaleido
+fitz
+pymupdf

@@ -253,6 +253,9 @@ def df_tabs(DF):
 
 
 
+# Load gene cluster dictionary
+with open(f'./data/gene_clusters_dict.pkl', 'rb') as f:
+    GENE_CLUSTERS = pickle.load(f)
 
 # Load DATA
 DATA = pd.read_csv(f'./data/DATA.csv', index_col='GENE')
@@ -908,3 +911,23 @@ def title_with_help(TITLE, help_text, help_width=0.1):
     with C[2]:
         with st.popover("", icon=':material/help:'):  # Usa st.popover
             st.write(help_text)
+            
+            
+            
+import fitz  # PyMuPDF
+import io
+from PIL import Image
+
+def convert_pdf_to_image(pdf_path, dpi=600):  # Add dpi argument with default value
+    try:
+        doc = fitz.open(pdf_path)
+        page = doc[0]  # Get the first (and only) page
+        pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))  # Set DPI using matrix
+        img = Image.open(io.BytesIO(pix.tobytes()))
+        return img
+    except fitz.fitz.FileNotFoundError:
+        return None
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return None
+    

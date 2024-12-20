@@ -15,6 +15,7 @@ from streamlit_pdf_viewer import pdf_viewer
 from streamlit_extras.bottom_container import bottom
 from plotly.subplots import make_subplots
 import plotly.colors as pc
+import colorsys
 
 import math
 from matplotlib import cm, colors as mcolors
@@ -819,6 +820,8 @@ def plotly_download_png(fig, file_name, scale=2):
     try:
         pio.write_image(fig, png_path, format="png", scale=scale)
 
+        key = np.random.randint(0, 1000000)
+        
         with open(png_path, "rb") as png_file:
             st.download_button(
                 label="",
@@ -826,7 +829,7 @@ def plotly_download_png(fig, file_name, scale=2):
                 data=png_file,
                 file_name=f"{file_name}.png",  # Include extension in download name
                 mime="image/png",
-                key=f"download_{file_name}_png"  # Unique key
+                key=f"download_{file_name}{key}_png"  # Unique key
             )
     except Exception as e:
         st.error(f"An error occurred during PNG export: {e}") #handle exceptions

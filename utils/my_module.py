@@ -535,7 +535,7 @@ def plot_violin_box(df, feature_group, ct_list, hm_col_dict, ct_col_dict, k=None
     # Scatter points overlay (jittered)
     sns.stripplot(
         data=melted_df, x='CT', y='Value', palette=[ct_col_dict[ct] for ct in ct_list], hue='CT',
-        ax=ax, jitter=True, size=1, alpha=0.5, linewidth=0.5, 
+        ax=ax, jitter=True, size=2, alpha=0.5, linewidth=0.5, 
     )
 
 
@@ -793,7 +793,6 @@ def plotly_download_pdf(fig, file_name):
 
     # Save the Plotly figure to a PDF file
     pio.write_image(fig, pdf_path, format='pdf')
-
     # Add a download button for the generated PDF
     with open(pdf_path, "rb") as pdf_file:
         st.download_button(
@@ -805,7 +804,33 @@ def plotly_download_pdf(fig, file_name):
             key=f"download_{file_name}"
         )
 
+def plotly_download_png(fig, file_name, scale=2):
+    """
+    Generates a PNG from a Plotly figure and adds a download button in Streamlit.
 
+    Args:
+        fig (plotly.graph_objects.Figure): Plotly figure to save to PNG.
+        file_name (str): Name of the PNG file (without extension).
+        scale (int, optional): Scaling factor for the image resolution. Defaults to 2.
+    """
+    png_path = f"/tmp/{file_name}.png"  # Add .png extension
+    os.makedirs(os.path.dirname(png_path), exist_ok=True)
+
+    try:
+        pio.write_image(fig, png_path, format="png", scale=scale)
+
+        with open(png_path, "rb") as png_file:
+            st.download_button(
+                label="",
+                icon=":material/download:",
+                data=png_file,
+                file_name=f"{file_name}.png",  # Include extension in download name
+                mime="image/png",
+                key=f"download_{file_name}_png"  # Unique key
+            )
+    except Exception as e:
+        st.error(f"An error occurred during PNG export: {e}") #handle exceptions
+        return None
 
 def create_gene_set_colors(gene_sets):
     """

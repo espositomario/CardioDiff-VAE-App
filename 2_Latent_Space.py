@@ -1,6 +1,6 @@
 from utils.my_module import *
 
-st.markdown("<h1 style='text-align: center;'>Gene encoded in the VAE Latent Space</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Genome in the VAE Latent Space</h1>", unsafe_allow_html=True)
 
 
 
@@ -26,10 +26,10 @@ with st.expander("Highlight genes in the scatter plot", icon=":material/checklis
 
 def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_index=0, 
             LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12):
-    import plotly.graph_objects as go
+    
 
     # Layout for control elements
-    C = st.columns([3, 1], vertical_alignment="bottom", gap="large")
+    C = st.columns([5,1, 1], vertical_alignment="bottom", gap="small")
     with C[0]:
         # Dropdown for feature selection
         selected_feature = st.selectbox(
@@ -135,14 +135,17 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, key, COLOR_DICTS=None, default_inde
 
     # Customize layout
     fig.update_layout(
-        title=None,
-        margin=dict(t=0),
-        xaxis=dict(showgrid=False, tickvals=[]),
-        yaxis=dict(showgrid=False, tickvals=[]),
+        title='',
+        margin=dict(t=50, r=50, b=50, l=50),
+        xaxis=dict(showgrid=False, zeroline=False,  tickvals=[]),
+        yaxis=dict(showgrid=False, zeroline=False,   tickvals=[]),
         plot_bgcolor="white",
-        autosize=True
+        autosize=False
     )
 
+    with C[2]:
+        plotly_download_png(fig, file_name=f"VAE_LatentSpace_UMAP_{selected_feature}.png")
+    
     return fig
 
 
@@ -174,7 +177,9 @@ with C[1]:
                     LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE)
     st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
     
+
     
-    
+
+
 
 add_footer()

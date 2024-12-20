@@ -253,9 +253,6 @@ def df_tabs(DF):
 
 
 
-# Load gene cluster dictionary
-with open(f'./data/gene_clusters_dict.pkl', 'rb') as f:
-    GENE_CLUSTERS = pickle.load(f)
 
 # Load DATA
 DATA = pd.read_csv(f'./data/DATA.csv', index_col='GENE')

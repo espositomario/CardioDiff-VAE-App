@@ -54,3 +54,4 @@ st.markdown("<h3 style='text-align: center;'>Filter data by features (columns)</
 #with st.expander("Select Features to display"):
 df_tabs(DATA)
 
+add_footer()

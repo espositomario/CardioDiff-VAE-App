@@ -41,9 +41,6 @@ if 'expand_all' not in st.session_state:
     
 with st.sidebar:
 
-    
-    
-    
     # Cluster selector input
     k = st.number_input(
         label="Select a Cluster (between 0 and 79)",
@@ -90,50 +87,48 @@ EXPANDED = False
 
 st.markdown("<h1 style='text-align: center;'>Cluster Navigator</h1>", unsafe_allow_html=True,)
 st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in term of input features distributions, Metagene plots...</h5>", unsafe_allow_html=True,)
-                
+st.markdown("<hr>", unsafe_allow_html=True)
 
 #-------------------Clusters composition-------------------#
-with st.expander("Clusters categories Maps",  icon=":material/stacked_bar_chart:", expanded=st.session_state.expand_all):
-    
-    title_with_help('Genes distribution among clusters by categories', 'help_text')
+title_with_help('Genes distribution among clusters by categories', 'help_text')
 
-    C = st.columns(2, gap="large")
+C = st.columns(2, gap="large")
 
-    # Cluster composition file viewers
-    CV_file = f"./data/plots/Clusters_CV.pdf"
-    Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
+# Cluster composition file viewers
+CV_file = f"./data/plots/Clusters_CV.pdf"
+Gonzalez_file = f"./data/plots/Clusters_Gonzalez.pdf"
 
-    with C[0]:
-        pdf_viewer(CV_file, key="CV_pdf")
-        try:
-            with open(CV_file, "rb") as CV_file_pdf:
-                CV_data = CV_file_pdf.read()
-            st.download_button(
-                label="",
-                key="download_CV",
-                icon=":material/download:",
-                data=CV_data,
-                file_name="CV_Categories_Clusters_Intersection.pdf",
-                mime="application/pdf",
-            )
-        except FileNotFoundError:
-            st.error("File not found.")
+with C[0]:
+    pdf_viewer(CV_file, key="CV_pdf")
+    try:
+        with open(CV_file, "rb") as CV_file_pdf:
+            CV_data = CV_file_pdf.read()
+        st.download_button(
+            label="",
+            key="download_CV",
+            icon=":material/download:",
+            data=CV_data,
+            file_name="CV_Categories_Clusters_Intersection.pdf",
+            mime="application/pdf",
+        )
+    except FileNotFoundError:
+        st.error("File not found.")
 
-    with C[1]:
-        pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
-        try:
-            with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
-                Gonzalez_data = Gonzalez_file_pdf.read()
-            st.download_button(
-                label="",
-                key="download_Gonzalez",
-                icon=":material/download:",
-                data=Gonzalez_data,
-                file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
-                mime="application/pdf",
-            )
-        except FileNotFoundError:
-            st.error("File not found.")
+with C[1]:
+    pdf_viewer(Gonzalez_file,  key="Gonzalez_pdf")
+    try:
+        with open(Gonzalez_file, "rb") as Gonzalez_file_pdf:
+            Gonzalez_data = Gonzalez_file_pdf.read()
+        st.download_button(
+            label="",
+            key="download_Gonzalez",
+            icon=":material/download:",
+            data=Gonzalez_data,
+            file_name="Gonzalez_Categories_Clusters_Intersection.pdf",
+            mime="application/pdf",
+        )
+    except FileNotFoundError:
+        st.error("File not found.")
 
 
 st.markdown("<hr>", unsafe_allow_html=True)

@@ -14,6 +14,8 @@ import plotly.io as pio
 from streamlit_pdf_viewer import pdf_viewer
 from streamlit_extras.bottom_container import bottom
 from plotly.subplots import make_subplots
+import plotly.colors as pc
+
 import math
 from matplotlib import cm, colors as mcolors
 from matplotlib.backends.backend_pdf import PdfPages
@@ -61,6 +63,70 @@ COLOR_DICTS = {
     "CV_Category": CV_COL_DICT,
     "ESC_ChromState_Gonzalez2021": GONZALEZ_COL_DICT,
 }
+
+
+def style_dataframe(df, header_bg_color="#4CAF50", header_text_color="#FFFFFF"):
+    """
+    Style a DataFrame for display in Streamlit with custom header background and text colors.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to style.
+    header_bg_color (str): Background color for the header (default: "#4CAF50").
+    header_text_color (str): Text color for the header (default: "#FFFFFF").
+
+    Returns:
+    pandas.io.formats.style.Styler: Styled DataFrame.
+    """
+    # Increase the Pandas Styler limit to handle large DataFrames
+    pd.set_option("styler.render.max_elements", df.size)
+    # Apply custom styles to the DataFrame
+    styled_df = df.style.set_table_styles([
+        {
+            'selector': 'thead th',
+            'props': [
+                ('background-color', header_bg_color),
+                ('color', header_text_color),
+                ('font-weight', 'bold'),
+                ('text-align', 'center')
+            ]
+        },
+        {
+            'selector': 'thead',
+            'props': [('border-bottom', '1px solid black')]
+        },
+        {
+            'selector': 'tbody tr',
+            'props': [('text-align', 'center')]
+        }
+    ])
+    return styled_df
+
+
+def style_dataframe(df, header_bg_color='lightblue', header_text_color='black'):
+    """
+    Styles a DataFrame for display in Streamlit, customizing the header background and text colors.
+
+    Args:
+        df: The DataFrame to style.
+        header_bg_color: The background color for the header.
+        header_text_color: The text color for the header.
+
+    Returns:
+        The styled DataFrame.
+    """
+    pd.set_option("styler.render.max_elements", df.size)
+
+    styled_df = df.style.set_properties(**{'background-color': 'white', 'color': 'black'})
+    styled_df = styled_df.set_table_styles([
+        {'selector': 'th',
+         'props': [
+             ('background-color', header_bg_color),
+             ('color', header_text_color),
+             ('font-weight', 'bold')
+         ]}
+    ])
+    return styled_df
+
 
 
 
@@ -738,3 +804,93 @@ def plotly_download_pdf(fig, file_name):
             key=f"download_{file_name}"
         )
 
+
+
+def create_gene_set_colors(gene_sets):
+    """
+    Create a dictionary mapping each gene set to a unique color.
+
+    Args:
+        gene_sets (list): List of unique gene sets.
+
+    Returns:
+        dict: Mapping of gene sets to colors.
+    """
+    colors = pc.qualitative.Set1  # Use a qualitative color scale
+    color_dict = {gene_set: colors[i % len(colors)] for i, gene_set in enumerate(sorted(gene_sets))}
+    return color_dict
+
+
+def create_gene_set_plot(df, color_dict):
+    """
+    Creates a scatter plot with all terms, colored by gene set, and sized by count.
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the data.
+        color_dict (dict): A dictionary mapping gene sets to colors.
+
+    Returns:
+        plotly.Figure: The figure object containing the plot.
+    """
+    # Sort the DataFrame by gene set and reverse-sort by p-value
+    df = df.sort_values(['Gene_set', '-log10(adj p-value)'], ascending=[True, False])
+
+    # Create the plot
+    fig = px.scatter(
+        df,
+        x='-log10(adj p-value)',
+        y='Term',
+        color='Gene_set',
+        size='Count',
+        hover_name='Term',  # Set Term as the hover title
+        hover_data={
+            'Odds Ratio': True,  # Include Odds Ratio
+            'Genes': True,       # Include Genes
+            'Count': True,       # Include Count
+            'Gene_set': False,   # Exclude Gene_set from hover
+        },
+        title=None,
+        category_orders={
+            'Term': df['Term'].tolist(),  # Match the descending order on y-axis
+        },
+        color_discrete_map=color_dict  # Use the color dictionary for consistent coloring
+    )
+    # Customize hovertemplate to remove extra hover box
+    fig.update_traces(
+        hovertemplate='<b>Term:</b> %{hovertext}<br>'
+                        '<b>Odds Ratio:</b> %{customdata[0]}<br>'
+                        '<b>Genes:</b> %{customdata[1]}<br>'
+                        '<b>Count:</b> %{customdata[2]}<extra></extra>'
+    )
+
+
+    # Add horizontal lines representing -log10(adj p-value) for each term
+    for _, row in df.iterrows():
+        fig.add_shape(
+            type="line",
+            x0=0,
+            x1=row['-log10(adj p-value)'],
+            y0=row['Term'],
+            y1=row['Term'],
+            line=dict(color=color_dict[row['Gene_set']], width=1,)
+        )
+    # Update layout
+    fig.update_layout(
+        plot_bgcolor='white',  # Set background to white
+        margin=dict(l=600, r=50, b=50, t=50),
+        xaxis=dict(
+            gridcolor='lightgrey',  # Grey grid lines
+            title='-log10(adj p-value)'
+        ),
+        yaxis=dict(
+            gridcolor='lightgrey',
+            title=None
+        ),
+        xaxis_title='-log10(adj p-value)',
+        yaxis_title=None,
+        legend_title='Gene Set',
+        width=1200,  # Fixed
+        height=(len(df['Term']) * 30)+200,  # Dynamic height adjustment based on the number of terms
+    )
+
+    return fig

@@ -264,17 +264,21 @@ with st.expander("Expression of selected genes", icon=":material/timeline:", exp
 #--------------------------------------------------------------
 with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=st.session_state.expand_all):
     st.markdown("<h3 style='text-align: center;'>Functional Term Enrichment Analysis</h3>", unsafe_allow_html=True)
-    if os.path.exists(ora_plot_pdf):
-        pdf_viewer(ora_plot_pdf)
-        with open(ora_plot_pdf, "rb") as pdf_file:
-            ora_data = pdf_file.read()
-        st.download_button(
-            label="",
-            icon=":material/download:",
-            data=ora_data,
-            file_name=f"C{k}_TermEnrichment.pdf",
-            mime="application/pdf",
-        )
+    
+    TOP5 = pd.read_csv("./data/TOP5_TermsPerCluster.csv", index_col=0)
+    TOP5_FILT= TOP5[TOP5['Cluster']==k]
+    
+    if not TOP5_FILT.empty:
+        # Create consistent color mapping
+        unique_gene_sets = TOP5_FILT['Gene_set'].unique()
+        color_dict = create_gene_set_colors(unique_gene_sets)
+
+        # Create the plot
+        fig = create_gene_set_plot(TOP5_FILT, color_dict)
+        st.plotly_chart(fig, use_container_width=True)
+        plotly_download_pdf(fig, file_name=f"C{k}_TermEnrichmentResults.pdf")
+
+
     else:
         
         st.markdown(

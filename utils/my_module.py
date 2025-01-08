@@ -279,7 +279,7 @@ LOG_FC_features = ['RNA_CM_CP_FC', 'RNA_CM_MES_FC', 'RNA_CM_ESC_FC',
 
 MISC_features = [ 'Cluster','RNA_CV', 'CV_Category', 'ESC_ChromState_Gonzalez2021', 'VAE_RMSE', 'VAE_Sc']
 
-LATENT_features = ['VAE1', 'VAE2', 'VAE3', 'VAE4', 'VAE5', 'VAE6', 'VAE_UMAP1', 'VAE_UMAP2']
+LATENT_features = ['VAE1', 'VAE2', 'VAE3', 'VAE4', 'VAE5', 'VAE6', 'VAE_UMAP1', 'VAE_UMAP2', 'VAE_PCA1(43%)', 'VAE_PCA2(18%)']
 
 FPKM_features = [ 'RNA_ESC_1', 'RNA_ESC_2', 'RNA_MES_1', 'RNA_MES_2',
             'RNA_CP_1', 'RNA_CP_2', 'RNA_CM_1', 'RNA_CM_2']

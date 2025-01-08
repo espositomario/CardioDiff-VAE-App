@@ -10,3 +10,4 @@ seaborn
 kaleido
 fitz
 pymupdf
+gseapy

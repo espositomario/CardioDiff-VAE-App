@@ -13,16 +13,21 @@ name = "Genome Navigator"
 icon = ":material/scatter_plot:"
 
 [[pages]]
-path = "3_Data.py"
+path = "3_Ontology_Navigator.py"
+name = "Ontology Navigator"
+icon = ":material/table_rows:"
+
+[[pages]]
+path = "4_Data.py"
 name = "Data Navigator"
 icon = ":material/table_rows:"
 
 [[pages]]
-path = "4_Help.py"
+path = "5_Help.py"
 name = "Help"
 
 
 
 [[pages]]
-path = "5_About.py"
+path = "6_About.py"
 name = "About"

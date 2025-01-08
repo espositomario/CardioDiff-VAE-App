@@ -4,6 +4,15 @@ st.markdown("<h1 style='text-align: center;'>Ontologies in the VAE Latent Space<
 
 import gseapy as gp
 
+def hum2mouse(GENE_LIST):
+    new_genes = []
+    for gene in GENE_LIST:
+        new_gene = gene[0] + gene[1:].lower()
+        new_genes.append(new_gene)
+    return new_genes
+
+
+
 # Load the list of available mouse databases
 DB_LIST = gp.get_library_name(organism='Mouse')
 
@@ -22,10 +31,9 @@ if SEL_DB:
 
     # Step 4: Display the genes from the selected gene sets
     if SEL_GENE_SET:
-        st.write(f"Genes in the Selected Gene Set: {DB[SEL_GENE_SET]}")
 
-
-
+        GENE_LIST = hum2mouse(DB[SEL_GENE_SET])
+        st.write(f"{GENE_LIST}")
 
 
 

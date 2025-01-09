@@ -18,7 +18,7 @@ DB_LIST = gp.get_library_name(organism='Mouse')
 
 
 # ropdown for selecting the database
-SEL_DB = st.selectbox("Select a Mouse Database:", DB_LIST)
+SEL_DB = st.selectbox("Select a Mouse Database:", DB_LIST,index=DB_LIST.index('KEGG_2019_Mouse'))
 
 # Once a database is selected, load the gene set
 if SEL_DB:

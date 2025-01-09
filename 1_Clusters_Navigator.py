@@ -14,25 +14,7 @@ def update_cluster_and_clear_query(k_value):
     st.session_state.k = k_value  # Update `k` in session state
     st.session_state.gene_query = ""  # Clear the query after updating
 
-def download_genes_list(GENE_LIST, k, key):
-    """
-    Download a list of genes as a text file.
 
-    Parameters:
-    - GENE_LIST: List of gene IDs to download.
-    - k: Cluster number for file name.
-    """
-    # Convert the list to a string with each element on a new line
-    GENE_LIST_FILE = "\n".join(GENE_LIST)
-
-    st.download_button(
-        label="Gene List",
-        icon=":material/download:",
-        data=GENE_LIST_FILE,
-        file_name=f"C{k}_GeneIDsList.txt",
-        mime="text/plain",
-        key=key
-    )
     
 
 if 'expand_states' not in st.session_state:

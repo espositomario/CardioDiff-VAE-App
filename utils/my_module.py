@@ -30,7 +30,7 @@ from pandas.api.types import (
     is_object_dtype,
 )
 
-
+import gseapy as gp
 
 
 CT_LIST = ['ESC', 'MES', 'CP', 'CM']
@@ -959,3 +959,31 @@ def convert_pdf_to_image(pdf_path, dpi=600):  # Add dpi argument with default va
         st.error(f"An error occurred: {e}")
         return None
     
+
+def hum2mouse(GENE_LIST):
+    new_genes = []
+    for gene in GENE_LIST:
+        new_gene = gene[0] + gene[1:].lower()
+        new_genes.append(new_gene)
+    return new_genes
+
+
+def download_genes_list(GENE_LIST, k=None, key=None, filename=None):
+    """
+    Download a list of genes as a text file.
+
+    Parameters:
+    - GENE_LIST: List of gene IDs to download.
+    - k: Cluster number for file name.
+    """
+    # Convert the list to a string with each element on a new line
+    GENE_LIST_FILE = "\n".join(GENE_LIST)
+
+    st.download_button(
+        label="Gene List",
+        icon=":material/download:",
+        data=GENE_LIST_FILE,
+        file_name=f"C{k}_GeneIDsList.txt" if filename is None else filename,
+        mime="text/plain",
+        key=key
+    )

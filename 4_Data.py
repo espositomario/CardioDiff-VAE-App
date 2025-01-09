@@ -6,6 +6,8 @@ from utils.my_module import *
 with st.sidebar:
     download_table(DATA)
 
+    get_gene_ncbi_page(NCBI_IDs)
+
 
 
 #-------------------Filter data by genes (rows)-------------------#
@@ -71,5 +73,10 @@ st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center;'>Filter data by features</h1>", unsafe_allow_html=True)
 #with st.expander("Select Features to display"):
 df_tabs(DATA)
+
+
+
+
+
 
 add_footer()

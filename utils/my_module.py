@@ -265,6 +265,8 @@ DATA['Cluster'] = pd.Categorical(DATA['Cluster'])
 #
 RNA_FPKM= pd.read_csv(f'./data/RNA_FPKMs.csv', index_col='GENE')
 
+#
+NCBI_IDs = pd.read_csv('./data/NCBI_ID.csv', index_col=0)
 
 # List of continuous features for coloring
 continuous_features = ["RNA_CV", "VAE_RMSE", "VAE_Sc"]
@@ -1152,3 +1154,19 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         plotly_download_png(fig, file_name=f"VAE_LatentSpace_{DR}_{selected_feature}")
     
     return fig
+
+
+
+def get_gene_ncbi_page(NCBI_IDs):
+    with st.popover("NCBI Gene Info"):
+        GENE = st.selectbox("Get a link to the NCBI Gene entry", 
+                                options=[""] + list(DATA.index),  # Empty string for no default selection
+                                format_func=lambda x: "Type a gene symbol..." if x == "" else x,
+                                help='Refseq Gene Symbol in Mouse',)
+        if GENE:
+            NCBI_URL = 'https://www.ncbi.nlm.nih.gov/gene/'
+            NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
+            if NCBI_ID == 0:
+                st.warning(f"No NCBI GeneID found for {GENE}")
+            else:
+                st.markdown(f"[NCBI link]({NCBI_URL}{NCBI_ID})", unsafe_allow_html=True)

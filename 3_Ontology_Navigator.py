@@ -26,8 +26,6 @@ if SEL_DB:
 
     if SEL_GENE_SET:
         GENE_LIST = hum2mouse(DB[SEL_GENE_SET])
-        st.write(f"{GENE_LIST}")
-
 
         
         TOTAL_GENES_IN_SET = len(GENE_LIST)

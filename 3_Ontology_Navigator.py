@@ -6,12 +6,12 @@ st.markdown("<h1 style='text-align: center;'>Ontologies in the VAE Latent Space<
 C = st.columns(2, gap='medium', vertical_alignment='top')
 
 
-# Load the list of available mouse databases
 DB_LIST = gp.get_library_name(organism='Mouse')
 with C[0]:
-    SEL_DB = st.selectbox("Database:", DB_LIST,index=DB_LIST.index('KEGG_2019_Mouse'), help='Enrichr API by gseapy python library')
+    SEL_DB = st.selectbox("Database:", DB_LIST,index=DB_LIST.index('WikiPathways_2024_Mouse'), 
+                            help='Enrichr API by gseapy python library',
+                            placeholder="Select or Type a database")
 
-# Once a database is selected, load the gene set
 if SEL_DB:
     with st.spinner(f"Loading gene sets from **{SEL_DB}**..."):
         DB = gp.get_library(name=SEL_DB, organism='Mouse')
@@ -19,34 +19,72 @@ if SEL_DB:
     GENE_SETS = list(DB.keys())
     with C[1]:
         # Step 3: Multiselect for gene sets
-        SEL_GENE_SET = st.selectbox("Gene Set:", GENE_SETS)
+        SEL_GENE_SET = st.selectbox("Gene Set:", GENE_SETS, 
+                                    index= GENE_SETS.index('Heart Development WP2067') if SEL_DB == 'WikiPathways_2024_Mouse'  else None,
+                                    placeholder="Select or Type a gene set")
 
-    # Step 4: Display the genes from the selected gene sets
+
     if SEL_GENE_SET:
         GENE_LIST = hum2mouse(DB[SEL_GENE_SET])
         st.write(f"{GENE_LIST}")
 
 
-    # Assuming you have DATA.index representing genes in your dataset
-    TOTAL_GENES_IN_SET = len(GENE_LIST)
-    GENE_LIST = set(DATA.index) & set(GENE_LIST)
-    INTERSECT_COUNT = len(GENE_LIST)
+        
+        TOTAL_GENES_IN_SET = len(GENE_LIST)
+        GENE_LIST = set(DATA.index) & set(GENE_LIST)
+        INTERSECT_COUNT = len(GENE_LIST)
     
-    with C[1]:
-        CC= st.columns([2,1], vertical_alignment='center')
-        with CC[0]:
-            st.write(f"Num. of genes: **{TOTAL_GENES_IN_SET}** (Intersecting with dataset: **{INTERSECT_COUNT}/{TOTAL_GENES_IN_SET}**)")
-        with CC[1]:
-            download_genes_list(GENE_LIST, key='GeneSet Download', filename=f'GeneIDs_{SEL_DB}_{SEL_GENE_SET}.txt')
+        with C[1]:
+            CC= st.columns([2,1], vertical_alignment='center')
+            with CC[0]:
+                st.write(f"Num. of genes: **{TOTAL_GENES_IN_SET}** (Intersecting with dataset: **{INTERSECT_COUNT}/{TOTAL_GENES_IN_SET}**)")
+            with CC[1]:
+                download_genes_list(GENE_LIST, key='GeneSet Download', filename=f'GeneIDs_{SEL_DB}_{SEL_GENE_SET}.txt')
+
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        title_with_help('Gene Set highligthed in the VAE latent space projection', 'help_text')
+        
+        
+        #
+        C = st.columns([3,1], vertical_alignment='bottom', gap='medium')
+        with C[0]:
+            DR = st.selectbox("Select dimensionality reduction method", ["UMAP", "PCA"])
+        with C[1]:
+            with st.popover("Highlighted points/genes", icon=":material/settings:",):
+
+                SHOW_LABELS = st.checkbox("Show gene labels", value=False)
+
+                SEL_GENES_SIZE = st.slider("Point size", min_value=6, max_value=24, value=10, step=2)
+                
+                SEL_POINT_ALPHA = st.slider("Point transparency", min_value=0.1, max_value=1.0, value=0.7, step=0.1)
+
+                if SHOW_LABELS: LABEL_SIZE = st.slider("Label size", min_value=8, max_value=20, value=10, step=2)
+                else: LABEL_SIZE = None
 
 
 
+        C = st.columns(2,gap="large")
+
+        with C[0]:    
+            KEY1 = 'key1'
+            
+            fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=1, 
+                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
+            st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
 
 
+        with C[1]:   
+            KEY2 = 'key2'
+            # Dropdown for feature selection
 
+            fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=2,
+                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
+            st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
+            
 
-
+    
 
 
 

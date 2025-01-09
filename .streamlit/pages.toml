@@ -15,7 +15,7 @@ icon = ":material/scatter_plot:"
 [[pages]]
 path = "3_Ontology_Navigator.py"
 name = "Ontology Navigator"
-icon = ":material/table_rows:"
+icon = ":material/menu_book:"
 
 [[pages]]
 path = "4_Data.py"

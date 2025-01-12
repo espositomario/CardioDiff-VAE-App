@@ -1164,9 +1164,9 @@ def get_gene_ncbi_page(NCBI_IDs):
                                 format_func=lambda x: "Type a gene symbol..." if x == "" else x,
                                 help='Refseq Gene Symbol in Mouse',)
         if GENE:
-            NCBI_URL = 'https://www.ncbi.nlm.nih.gov/gene/'
+            
             NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
             if NCBI_ID == 0:
-                st.warning(f"No NCBI GeneID found for {GENE}")
+                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
             else:
-                st.markdown(f"[NCBI link]({NCBI_URL}{NCBI_ID})", unsafe_allow_html=True)
+                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/{NCBI_ID})", unsafe_allow_html=True)

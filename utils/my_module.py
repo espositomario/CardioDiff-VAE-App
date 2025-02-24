@@ -510,7 +510,7 @@ def download_table(DATA):
 
     # Create the download button
     st.download_button(
-        label="Data (10MB)",
+        label="Data (12MB)",
         icon=":material/download:",  
         data=csv_data,
         file_name="CardioDiffVAE_data.csv",

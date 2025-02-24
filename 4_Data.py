@@ -6,7 +6,7 @@ from utils.my_module import *
 with st.sidebar:
     download_table(DATA)
 
-    get_gene_ncbi_page(NCBI_IDs)
+    #get_gene_ncbi_page(NCBI_IDs)
 
 
 

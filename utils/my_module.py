@@ -207,6 +207,8 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 if user_text_input:
                     df = df[df[column].str.contains(user_text_input)]
 
+
+
     return df
 
 def df_tabs(DF):
@@ -261,6 +263,7 @@ with open(f'./data/gene_clusters_dict.pkl', 'rb') as f:
 # Load DATA
 DATA = pd.read_csv(f'./data/DATA.csv', index_col='GENE')
 DATA['Cluster'] = pd.Categorical(DATA['Cluster'])
+
 
 #
 RNA_FPKM= pd.read_csv(f'./data/RNA_FPKMs.csv', index_col='GENE')
@@ -1167,6 +1170,8 @@ def get_gene_ncbi_page(NCBI_IDs):
             
             NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
             if NCBI_ID == 0:
-                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
+                #st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
+                st.markdown(f"[NCBI link]https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D",
+                            unsafe_allow_html=True)
             else:
                 st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/{NCBI_ID})", unsafe_allow_html=True)

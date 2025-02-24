@@ -207,17 +207,32 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 if user_text_input:
                     df = df[df[column].str.contains(user_text_input)]
 
+#https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D
+    st.dataframe(
+    df,
+    column_config={
+        "NCBI": st.column_config.LinkColumn(
+            "Gene Name",
+            help="Click to open the NCBI Gene page",
+            #validate=r"^https://[a-z]+\.streamlit\.app$",
+            #max_chars=100,
+            display_text=r"AND\+(.+?)%5BGene\+Name%5D"
 
+            #display_text="NCBI-Gene"
+        ),
+    },
+    hide_index=True,
+    )
 
     return df
 
 def df_tabs(DF):
     # Feature groups
-    Z_AVG =  DF[[col for col in Z_AVG_features if col in DF.columns]]
-    LOG_FC = DF[[col for col in LOG_FC_features if col in DF.columns]]
-    MISC =   DF[[col for col in MISC_features if col in DF.columns]]
-    LATENT = DF[[col for col in LATENT_features if col in DF.columns]]
-    FPKM =   DF[[col for col in FPKM_features if col in DF.columns]]
+    Z_AVG =  DF[['NCBI']+[col for col in Z_AVG_features if col in DF.columns]]
+    LOG_FC = DF[['NCBI']+[col for col in LOG_FC_features if col in DF.columns]]
+    MISC =   DF[['NCBI']+[col for col in MISC_features if col in DF.columns]]
+    LATENT = DF[['NCBI']+[col for col in LATENT_features if col in DF.columns]]
+    FPKM =   DF[['NCBI']+[col for col in FPKM_features if col in DF.columns]]
 
     # Create Streamlit tabs
     tabs = st.tabs(["Full table", "Features Z-scores", "RNA Log FCs", "Annotations", "VAE Latent Space", "RNA FPKMs"])
@@ -225,32 +240,32 @@ def df_tabs(DF):
     with tabs[0]:  # All
         st.markdown("### Full table", 
                     help="This table contains all the input features, annotations, and other information for all genes.")
-        st.dataframe(filter_dataframe(DF))
+        filter_dataframe(DF)
 
     with tabs[1]:  # Z-scores
         st.markdown("### Input features Z-scores", 
                     help="This table displays the Z-scores of ChIP-seq levels, which represent chromatin immunoprecipitation sequencing data averaged between replicates.")
-        st.dataframe(filter_dataframe(Z_AVG))
+        filter_dataframe(Z_AVG)
 
     with tabs[2]:  # Log Fold Changes
         st.markdown("### Input RNA Log Fold Changes (LogFCs)", 
                     help="This table contains the log fold change values, showing the relative expression differences between experimental conditions.")
-        st.dataframe(filter_dataframe(LOG_FC))
+        filter_dataframe(LOG_FC)
 
     with tabs[3]:  # Annotations
         st.markdown("### Gene annotations", 
                     help="This table includes annotations and miscellaneous features for the genes, such as genomic context, functional categories, or metadata.")
-        st.dataframe(filter_dataframe(MISC))
+        filter_dataframe(MISC)
 
     with tabs[4]:  # VAE Latent Space
         st.markdown("### VAE Latent Variables and UMAP projections", 
                     help="These columns represent the 6D latent space coordinates derived from a Variational Autoencoder (VAE). They capture compressed representations of gene features.")
-        st.dataframe(filter_dataframe(LATENT))
+        filter_dataframe(LATENT)
 
     with tabs[5]:  # RNA FPKMs
         st.markdown("### RNA-seq FPKMs per replicate", 
                     help="This table contains RNA-seq FPKM (Fragments Per Kilobase of transcript per Million mapped reads) values for gene expression across different cell types.")
-        st.dataframe(filter_dataframe(FPKM))
+        filter_dataframe(FPKM)
 
 
 
@@ -264,7 +279,14 @@ with open(f'./data/gene_clusters_dict.pkl', 'rb') as f:
 DATA = pd.read_csv(f'./data/DATA.csv', index_col='GENE')
 DATA['Cluster'] = pd.Categorical(DATA['Cluster'])
 
+NCBI_col = DATA.index.to_series().apply(lambda GENE: f"https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D")
 
+# Create the NCBI column and insert it as the first column
+DATA.insert(
+    0,  # Position (0 means first column)
+    "NCBI",  # Column name
+    NCBI_col  # Column data
+)
 #
 RNA_FPKM= pd.read_csv(f'./data/RNA_FPKMs.csv', index_col='GENE')
 
@@ -1171,7 +1193,7 @@ def get_gene_ncbi_page(NCBI_IDs):
             NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
             if NCBI_ID == 0:
                 #st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
-                st.markdown(f"[NCBI link]https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D",
+                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D)",
                             unsafe_allow_html=True)
             else:
                 st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/{NCBI_ID})", unsafe_allow_html=True)

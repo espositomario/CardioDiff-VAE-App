@@ -18,8 +18,20 @@ SEL_GENES = select_genes()
 # Plot Sankey diagram 
 if SEL_GENES:
     # filter DATA by sekected genes
-    st.dataframe(DATA.loc[SEL_GENES])
-    
+    st.dataframe(DATA.loc[SEL_GENES], 
+                        column_config={
+                                    "NCBI": st.column_config.LinkColumn(
+                                        "Gene Name",
+                                        help="Click to open the NCBI Gene page",
+                                        #validate=r"^https://[a-z]+\.streamlit\.app$",
+                                        #max_chars=100,
+                                        display_text=r"AND\+(.+?)%5BGene\+Name%5D"
+
+                                        #display_text="NCBI-Gene"
+                                    ),
+                                },
+                                hide_index=True,
+    )
     #l
     
     

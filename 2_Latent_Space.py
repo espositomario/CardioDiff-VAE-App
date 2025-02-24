@@ -33,7 +33,7 @@ with st.expander("Highlight genes in the scatter plot", icon=":material/checklis
 
 
 
-C = st.columns(2,gap="large")
+C = st.columns(2,gap="small")
 
 
 

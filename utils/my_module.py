@@ -32,6 +32,7 @@ from pandas.api.types import (
 
 import gseapy as gp
 
+HOME_LINK = "https://cardiodiff-vae.streamlit.app"
 
 CT_LIST = ['ESC', 'MES', 'CP', 'CM']
 HM_LIST = ['H3K4me3', 'H3K27ac', 'H3K27me3',  'RNA']
@@ -792,7 +793,7 @@ def add_footer():
         }
         </style>
         <div class="footer">
-            <p>Mario Esposito, Enrique Blanco and Luciano Di Croce © 2024 | 
+            <p>Mario Esposito, Luciano Di Croce and Enrique Blanco © 2025 | 
                 <a href="https://github.com/espositomario" target="_blank">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 20px; height: 20px; vertical-align: text-center;" />
                 </a>

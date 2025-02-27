@@ -3,14 +3,14 @@ path = "0_Home.py"
 name = "Home"
 
 [[pages]]
-path = "1_Clusters_Navigator.py"
-name = "Cluster Navigator"
-icon = ":material/explore:"
-
-[[pages]]
-path = "2_Latent_Space.py"
+path = "1_Latent_Space.py"
 name = "Genome Navigator"
 icon = ":material/scatter_plot:"
+
+[[pages]]
+path = "2_Clusters_Navigator.py"
+name = "Cluster Navigator"
+icon = ":material/explore:"
 
 [[pages]]
 path = "3_Ontology_Navigator.py"

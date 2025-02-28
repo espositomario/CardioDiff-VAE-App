@@ -52,8 +52,8 @@ PAGES_DICT = {
 
 ABOUT_DICT = {
     1:{'name': 'Mario Esposito', 'image': './data/plots/Mario_Esposito.jpg', 
-    'description': 'Mario Esposito obtained his Bachelor’s degree in Health Biotechnology from the University of Naples Federico II in 2022. During his undergraduate studies, he interned at CEINGE Biotecnologie avanzate in Naples in the Mario Capasso Lab, where he analyzed whole-exome sequencing data to identify rare genetic variants associated with neuroblastoma. \
-            In 2024, he completed his Master’s degree in Bioinformatics at the University of Bologna. During his Master’s studies, he joined the Centre for Genomic Regulation (CRG) in Barcelona as an Erasmus+ intern in the Luciano Di Croce Lab (2024), where he explored Variational Autoencoders for multi-omics data integration and representation learning during cardiac differentiation in mice.'},
+    'description': 'Mario Esposito obtained his Bachelor’s degree in Health Biotechnology from the University of Naples Federico II in 2022. During his undergraduate studies, he interned at CEINGE Biotecnologie avanzate in Naples in the Mario Capasso Lab. \
+            In 2024, he completed his Master’s degree in Bioinformatics at the University of Bologna. During his Master’s studies, he joined the Centre for Genomic Regulation (CRG) in Barcelona as an Erasmus+ intern in the Luciano Di Croce Lab (2024)'},
     
     2:{'name': 'Luciano Di Croce', 'image': './data/plots/Luciano_Di_Croce.jpg',
     'description': 'text'},
@@ -246,7 +246,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df,
     column_config={
         "NCBI": st.column_config.LinkColumn(
-            "Gene Name",
+            "NCBI",
             help="Click to open the NCBI Gene page",
             #validate=r"^https://[a-z]+\.streamlit\.app$",
             #max_chars=100,
@@ -255,7 +255,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             #display_text="NCBI-Gene"
         ),
     },
-    hide_index=True,
+    #hide_index=True,
     )
 
     return df
@@ -272,33 +272,27 @@ def df_tabs(DF):
     tabs = st.tabs(["Full table", "Features Z-scores", "RNA Log FCs", "Annotations", "VAE Latent Space", "RNA FPKMs"])
 
     with tabs[0]:  # All
-        st.markdown("### Full table", 
-                    help="This table contains all the input features, annotations, and other information for all genes.")
+        st.markdown("### Full table", )
         filter_dataframe(DF)
 
     with tabs[1]:  # Z-scores
-        st.markdown("### Input features Z-scores", 
-                    help="This table displays the Z-scores of ChIP-seq levels, which represent chromatin immunoprecipitation sequencing data averaged between replicates.")
+        st.markdown("### Input features Z-scores", )
         filter_dataframe(Z_AVG)
 
     with tabs[2]:  # Log Fold Changes
-        st.markdown("### Input RNA Log Fold Changes (LogFCs)", 
-                    help="This table contains the log fold change values, showing the relative expression differences between experimental conditions.")
+        st.markdown("### Input RNA Log Fold Changes (LogFCs)", )
         filter_dataframe(LOG_FC)
 
     with tabs[3]:  # Annotations
-        st.markdown("### Gene annotations", 
-                    help="This table includes annotations and miscellaneous features for the genes, such as genomic context, functional categories, or metadata.")
+        st.markdown("### Gene annotations", )
         filter_dataframe(MISC)
 
     with tabs[4]:  # VAE Latent Space
-        st.markdown("### VAE Latent Variables and UMAP projections", 
-                    help="These columns represent the 6D latent space coordinates derived from a Variational Autoencoder (VAE). They capture compressed representations of gene features.")
+        st.markdown("### VAE Latent Variables and UMAP projections", )
         filter_dataframe(LATENT)
 
     with tabs[5]:  # RNA FPKMs
-        st.markdown("### RNA-seq FPKMs per replicate", 
-                    help="This table contains RNA-seq FPKM (Fragments Per Kilobase of transcript per Million mapped reads) values for gene expression across different cell types.")
+        st.markdown("### RNA-seq FPKMs per replicate", )
         filter_dataframe(FPKM)
 
 

@@ -3,6 +3,49 @@ from utils.my_module import *
 #st.set_page_config(layout="wide", initial_sidebar_state="expanded", 
 #                    page_icon=":material/search:",)
 
+HELP_DICT = {
+    "Cluster categories Map": "- On the LEFT: Tree maps depicting the percentage of genes in each cluster defined as most variable\
+        and most stable in term of expression coefficient of variation . Five lists were generated: the most variable genes (top 4,000 CV) stratified by their\
+        CTmax values (ESC, MES, CP, CM) and the most stable genes (bottom 4,000 CV).\
+            \n- On the RIGHT: Tree maps depicting the percentage of genes in each cluster annotated with an active,\
+            bivalent or other chromatin state (in ESC) in another study (Gonzalez, 2021).\
+            \n- The max rectangle area corresponds to a percentage of 100%.",
+    
+    "Features distributions": "- Input Features Z-scores distributions averaged across replicates,\
+                    are grouped by Histone Modifications and gene expression (RNA).\
+                        \n- Y-axis limits are set to the 0.1 and 99.9 percentiles of the data.",
+    
+    "MetaGene plots": "- TSS meta-plots display each Histone Modification (HM) across distinct Cell Types (CT),\
+            with dashed lines representing\
+            the corresponding control (Whole Cell Extract) signals for each CT. \
+                \n- The y-axis maximum is consistent\
+            among clusters, set to the maximum y-value among all clusters for each HM and CT combination.\
+                \n-  averaged ChIP-seq metaplots centered on the Transcription Start Site (TSS)\
+                were generated independently for each HM (and control) across all CTs, using SeqCode\
+                \(produceTSSplots). A single replicate BAM file was used for each HM/CT combination. The\
+                fragment length was set to 250 bp, with a sliding window of 50 bp, covering a region from -\
+                2500 to +2500 bp relative to the TSS. Signal profiles were smoothed using a moving rolling\
+                mean with a window size of 200 bp. To make the plots scales as much comparable as possible\
+                the maximum y-axis value was set for each CT-HM combination as the maximum value among\
+                all clusters.",
+                
+    
+    "Cluster categories": "- On the TOP: Tree maps depicting the percentage of genes in each cluster defined as most variable\
+        and most stable in term of expression coefficient of variation . Five lists were generated: the most variable genes (top 4,000 CV) stratified by their\
+        CTmax values (ESC, MES, CP, CM) and the most stable genes (bottom 4,000 CV).\
+            \n- On the BOTTOM: Tree maps depicting the percentage of genes in each cluster annotated with an active,\
+            bivalent or other chromatin state (in ESC) in another study (Gonzalez, 2021).\
+            \n- The max rectangle area corresponds to a percentage of 100%.",
+    
+    "Expression of selected genes": "- Expression patterns of 16 randomly selected genes from the cluster (or custom selection). Each dot represents a replicate.",
+    
+    "Functional Term Enrichment Analysis": "- Term enrichment analyses were conducted using GSEApy in Python (via the EnrichR API)\
+                            \n- The background list included all genes from the dataset (n=14996). \
+                            \n- Only the top 5 significant terms were reported for each gene set, based on the adjusted p-value (adj. p < 0.05).",
+    
+    "Information of the Cluster": "Information of the Cluster"
+}
+
 # Define session state variables for `k` and `gene_query`
 if "k" not in st.session_state:
     st.session_state.k = 76  # Default cluster
@@ -80,7 +123,7 @@ st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in te
 #-------------------Clusters composition-------------------#
 with st.expander("Cluster categories Map",  icon=":material/stacked_bar_chart:",expanded=st.session_state.expand_states['bool']):
 
-    title_with_help('Genes distribution among clusters by categories', 'help_text')
+    title_with_help('Genes distribution among clusters by categories', HELP_DICT['Cluster categories Map'])
 
     C = st.columns(2)
 
@@ -127,7 +170,7 @@ with st.expander("Cluster categories Map",  icon=":material/stacked_bar_chart:",
             st.error("File not found.")
 
 
-st.markdown("<hr>", unsafe_allow_html=True)
+st.divider()
 
 st.markdown(f"<h5 style='text-align: center;'>Select a cluster from the sidebar</h5>", unsafe_allow_html=True)   
 st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h3>", unsafe_allow_html=True)   
@@ -136,7 +179,7 @@ st.markdown(f"<h3 style='text-align: center;'>Cluster {k} (n= {NUM_OF_GENES})</h
 
 #------------------------------------------Features distributions------------------------------------------#
 with st.expander("Features distributions",  icon=":material/bar_chart:",expanded=st.session_state.expand_states['bool']):
-    title_with_help('Features distributions', 'help_text')
+    title_with_help('Features distributions', HELP_DICT['Features distributions'])
 
     C = st.columns(4, gap="small")
 
@@ -183,7 +226,7 @@ with st.expander("Features distributions",  icon=":material/bar_chart:",expanded
 #------------------------------------------TSS and Categories------------------------------------------#
 
 with st.expander("MetaGene plots", icon=":material/area_chart:", expanded=st.session_state.expand_states['bool']):
-    title_with_help('MetaGene Plots', 'help_text')
+    title_with_help('MetaGene Plots', HELP_DICT['MetaGene plots'])
 
     tss_plot_pdf_file = f"./data/plots/TSSplots/C{k}_ext.pdf"
 
@@ -210,7 +253,7 @@ with st.expander("MetaGene plots", icon=":material/area_chart:", expanded=st.ses
 
 #------------------------------------------TSS and Categories------------------------------------------#
 with st.expander("Cluster categories",  icon=":material/stacked_bar_chart:", expanded=st.session_state.expand_states['bool']):
-        title_with_help('Categories proportions', 'help_text')
+        title_with_help('Categories proportions', HELP_DICT['Cluster categories'])
 
         bar_comp= plot_stacked_bar(DATA[DATA['Cluster'] == k], ["ESC_ChromState_Gonzalez2021","CV_Category"] , COLOR_DICTS)
 
@@ -220,7 +263,7 @@ with st.expander("Cluster categories",  icon=":material/stacked_bar_chart:", exp
 
 #--------------------------------------------------------------
 with st.expander("Expression of selected genes", icon=":material/timeline:", expanded=st.session_state.expand_states['bool']):
-    title_with_help('Expression of selected genes', 'help_text')
+    title_with_help('Expression of selected genes', HELP_DICT['Expression of selected genes'])
 
     # Randomly select 16 genes as default
     
@@ -254,7 +297,7 @@ with st.expander("Expression of selected genes", icon=":material/timeline:", exp
 
 #--------------------------------------------------------------
 with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_strong:", expanded=st.session_state.expand_states['bool']):
-    title_with_help('Functional Term Enrichment Analysis', 'help_text')
+    title_with_help('Functional Term Enrichment Analysis', HELP_DICT['Functional Term Enrichment Analysis'])
 
     TOP5 = pd.read_csv("./data/TOP5_TermsPerCluster.csv", index_col=0)
     TOP5_FILT= TOP5[TOP5['Cluster']==k]
@@ -282,7 +325,7 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         )
 #--------------------------------------------------------------
 with st.expander("Information of the Cluster", icon=":material/table_rows:",expanded=st.session_state.expand_states['bool']):
-    title_with_help('Information of the Cluster', 'help_text')
+    title_with_help('Information of the Cluster', HELP_DICT['Information of the Cluster'])
     df_tabs(SEL.drop(columns='Cluster'))
     
 

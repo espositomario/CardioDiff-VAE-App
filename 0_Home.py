@@ -1,8 +1,7 @@
 from utils.my_module import *
 
 st.markdown(f"<h1 style='text-align: center;'>{APP_NAME}</h3>", unsafe_allow_html=True)   
-st.markdown("<hr>", unsafe_allow_html=True)
-
+st.divider()
 
 
 st.markdown(f"<h3 style='text-align: center;'>Functions</h3>", unsafe_allow_html=True)   
@@ -12,8 +11,7 @@ for i in range(4):
     with cols[i]:
         page_cover(PAGES_DICT, i+1)
 
-st.markdown("<hr>", unsafe_allow_html=True)
-
+st.divider()
 #---------------------------------#
 def page_description(PAGES_DICT, i):
     cols = st.columns([3,1], gap='large', vertical_alignment='center')
@@ -39,7 +37,7 @@ for i in range(4):
 
 
 #---------------------------------#
-st.markdown("<hr>", unsafe_allow_html=True)
+st.divider()
 st.markdown(f"<h3 style='text-align: center;'>VAE model architecture</h3>", unsafe_allow_html=True)   
 
 fig1 = convert_pdf_to_image('./data/plots/fig1.pdf',)
@@ -47,7 +45,7 @@ if fig1:
     st.image(fig1, use_container_width=True)
 
 #---------------------------------#
-st.markdown("<hr>", unsafe_allow_html=True)
+st.divider()
 st.markdown(f"<h3 style='text-align: center;'>VAE model architecture</h3>", unsafe_allow_html=True)   
 
 fig2 = convert_pdf_to_image('./data/plots/fig2.pdf',)
@@ -55,7 +53,7 @@ if fig2:
     st.image(fig2, use_container_width=True)
 
 #---------------------------------#
-st.markdown("<hr>", unsafe_allow_html=True)
+st.divider()
 st.markdown(f"<h3 style='text-align: center;'>VAE model architecture</h3>", unsafe_allow_html=True)   
 
 fig3 = convert_pdf_to_image('./data/plots/fig3.pdf',)

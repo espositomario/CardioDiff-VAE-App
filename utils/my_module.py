@@ -33,6 +33,33 @@ from pandas.api.types import (
 import gseapy as gp
 
 HOME_LINK = "https://cardiodiff-vae.streamlit.app"
+APP_NAME= 'CardioDiff-VAE'
+
+
+PAGES_DICT = {
+    1: {'file': './1_Latent_Space.py', 'name': 'Genome Navigator', 'image': './data/plots/page1.jpg', 
+        'description': 'Explore the genome in the VAE latent space.'},
+    
+    2: {'file': './2_Clusters_Navigator.py', 'name': 'Cluster Navigator', 'image': './data/plots/page2.jpg',
+        'description': 'Explore the clusters in the VAE latent space.'},
+    
+    3: {'file': './3_Ontology_Navigator.py', 'name': 'Ontology Navigator', 'image': './data/plots/page3.jpg',
+        'description': 'Explore the ontologies in the VAE latent space.'},
+    
+    4: {'file': './4_Data.py', 'name': 'Data Navigator', 'image': './data/plots/page4.jpg', 
+        'description': 'Explore the data.'},
+}
+
+ABOUT_DICT = {
+    1:{'name': 'Mario Esposito', 'image': './data/plots/Mario_Esposito.jpg', 
+    'description': 'Mario Esposito obtained his Bachelor’s degree in Health Biotechnology from the University of Naples Federico II in 2022. During his undergraduate studies, he interned at CEINGE Biotecnologie avanzate in Naples in the Mario Capasso Lab, where he analyzed whole-exome sequencing data to identify rare genetic variants associated with neuroblastoma. \
+            In 2024, he completed his Master’s degree in Bioinformatics at the University of Bologna. During his Master’s studies, he joined the Centre for Genomic Regulation (CRG) in Barcelona as an Erasmus+ intern in the Luciano Di Croce Lab (2024), where he explored Variational Autoencoders for multi-omics data integration and representation learning during cardiac differentiation in mice.'},
+    
+    2:{'name': 'Luciano Di Croce', 'image': './data/plots/Luciano_Di_Croce.jpg',
+    'description': 'text'},
+    3:{'name': 'Enrique Blanco', 'image': './data/plots/Enrique_Blanco.jpg',
+    'description': 'text'},
+}
 
 CT_LIST = ['ESC', 'MES', 'CP', 'CM']
 HM_LIST = ['H3K4me3', 'H3K27ac', 'H3K27me3',  'RNA']
@@ -67,6 +94,12 @@ COLOR_DICTS = {
 }
 
 
+def page_cover(PAGE_DICTS, i):
+    st.image(PAGE_DICTS[i]['image'], use_container_width=True)
+    if st.button(PAGE_DICTS[i]['name'], key=PAGE_DICTS[i]['name'], use_container_width=True):
+        st.switch_page(PAGE_DICTS[i]['file'])
+        
+        
 def style_dataframe(df, header_bg_color="#4CAF50", header_text_color="#FFFFFF"):
     """
     Style a DataFrame for display in Streamlit with custom header background and text colors.

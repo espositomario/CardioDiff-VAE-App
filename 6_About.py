@@ -1,9 +1,9 @@
 from utils.my_module import *
 
 st.divider()
-st.markdown("<h2 style='text-align: center;'>TITLE</h3>", unsafe_allow_html=True)   
+st.markdown("<h2 style='text-align: center;'>TITLE</h2>", unsafe_allow_html=True)   
 st.markdown("<h3 style='text-align: center;'>Mario Esposito, Luciano Di Croce and Enrique Blanco</h3>", unsafe_allow_html=True)   
-st.markdown("<h4 style='text-align: center;'>Abstract</h3>", unsafe_allow_html=True)   
+st.markdown("<h4 style='text-align: center;'>Abstract</h4>", unsafe_allow_html=True)   
 st.markdown("<div style='text-align: center;'><body>Text</body></div>", unsafe_allow_html=True)  
 
 def about_description(DICT, i):

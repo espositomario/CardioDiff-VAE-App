@@ -806,7 +806,7 @@ def add_footer():
         <style>
         .footer {
             margin-top: 50px;
-            margin-bottom: 50px;
+            margin-bottom: 10px;
             padding: 30px 0;
             text-align: center;
             font-size: 14px;
@@ -823,9 +823,6 @@ def add_footer():
             <p>Mario Esposito, Luciano Di Croce and Enrique Blanco © 2025 | 
                 <a href="https://github.com/espositomario" target="_blank">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" style="width: 20px; height: 20px; vertical-align: text-center;" />
-                </a>
-                <a href="https://linkedin.com/in/esposito-mario" target="_blank">
-                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn Logo" style="width: 14px; height: 14px; vertical-align: text-center;" />
                 </a>
             </p>
         </div>

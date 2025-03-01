@@ -41,8 +41,8 @@ if SEL_DB:
 
 
         st.markdown("<hr>", unsafe_allow_html=True)
-        title_with_help('Gene Set highligthed in the VAE latent space projection', 'help_text')
-        
+        st.markdown(f"<h3 style='text-align: center;'>{SEL_GENE_SET} genes highligthed in the VAE latent space projection</h3>", unsafe_allow_html=True)   
+
         
         #
         C = st.columns([3,1], vertical_alignment='bottom', gap='medium')

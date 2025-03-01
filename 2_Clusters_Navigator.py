@@ -325,7 +325,7 @@ with st.expander("Functional Term Enrichment Analysis", icon=":material/hdr_stro
         )
 #--------------------------------------------------------------
 with st.expander("Information of the Cluster", icon=":material/table_rows:",expanded=st.session_state.expand_states['bool']):
-    title_with_help('Information of the Cluster', HELP_DICT['Information of the Cluster'])
+    title_with_help('Information of the Cluster', f"[Data tables description]({HOME_LINK}/Data#data-tables-description)")
     df_tabs(SEL.drop(columns='Cluster'))
     
 

@@ -23,4 +23,42 @@ st.markdown("<h1 style='text-align: center;'>About us</h1>", unsafe_allow_html=T
 st.divider()
 about_description(ABOUT_DICT, 1)
 
+
+
+#---------------------------------#
+st.markdown('#')
+st.divider()
+st.markdown("<h1 style='text-align: center;'>Credits and References</h1>", unsafe_allow_html=True)   
+st.divider()
+CREDITS= """
+- **Streamlit**  [Official Website](https://streamlit.io/) 
+
+- **Plotly**  [Official Website](https://plotly.com/) 
+
+- **Pandas**  [Official Website](https://pandas.pydata.org/) McKinney, W. (2010)
+
+- **Streamlit PDF Viewer**  [GitHub Repository](https://github.com/andfanilo/streamlit-pdf-viewer)
+
+- **Streamlit Extras**  [GitHub Repository](https://arnaudmiribel.github.io/streamlit-extras/)
+
+- **Streamlit Searchbox** [GitHub Repository](https://github.com/m-wrzr/streamlit-searchbox)
+
+- **Matplotlib**  [Official Website](https://matplotlib.org/) Hunter, J. D. (2007)
+
+- **Seaborn** [Official Website](https://seaborn.pydata.org/) Waskom, M. L. (2021)
+
+- **Kaleido**  [GitHub Repository](https://github.com/plotly/Kaleido)
+
+- **PyMuPDF (fitz)**  [GitHub Repository](https://github.com/pymupdf/PyMuPDF)
+
+- **GSEApy**  [Official Website](https://gseapy.readthedocs.io/en/latest/) Zhuoqing, F. (2023)
+  
+"""
+
+st.markdown(CREDITS)
+
+
+
+
+
 add_footer()

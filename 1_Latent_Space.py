@@ -1,7 +1,7 @@
 from utils.my_module import *
 
 st.markdown("<h1 style='text-align: center;'>Genome in the VAE Latent Space</h1>", unsafe_allow_html=True)
-st.markdown("""UMAP projection of the genes mapped in the 6-dimensional latent space of the VAE (each point represent a gene) """)
+st.markdown("<h5 style='text-align: center;'>UMAP projection of the genes mapped in the 6-dimensional latent space of the VAE (each point represent a gene)</h5>", unsafe_allow_html=True)
 
 DR = st.selectbox("Select Dimensionality Reduction", ["UMAP", "PCA"])
 

@@ -37,7 +37,7 @@ HELP_DICT = {
             bivalent or other chromatin state (in ESC) in another study (Gonzalez, 2021).\
             \n- The max rectangle area corresponds to a percentage of 100%.",
     
-    "Expression of selected genes": "- Expression patterns of 16 randomly selected genes from the cluster (or custom selection). Each dot represents a replicate.",
+    "Expression of selected genes": "- Expression patterns of 18 randomly selected genes from the cluster (or custom selection). Each dot represents a replicate.",
     
     "Functional Term Enrichment Analysis": "- Term enrichment analyses were conducted using GSEApy in Python (via the EnrichR API)\
                             \n- The background list included all genes from the dataset (n=14996). \

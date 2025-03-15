@@ -37,16 +37,16 @@ APP_NAME= 'CardioDiff-VAE'
 
 
 PAGES_DICT = {
-    1: {'file': './1_Latent_Space.py', 'name': 'Genome Navigator', 'image': './data/plots/page1.jpg', 
+    1: {'file': './1_Latent_Space.py', 'name': 'Genome', 'image': './data/plots/page1.jpg', 
         'description': 'Explore the genome in the VAE latent space.'},
     
-    2: {'file': './2_Clusters_Navigator.py', 'name': 'Cluster Navigator', 'image': './data/plots/page2.jpg',
+    3: {'file': './3_Clusters_Navigator.py', 'name': 'Clusters', 'image': './data/plots/page2.jpg',
         'description': 'Explore the clusters in the VAE latent space.'},
     
-    3: {'file': './3_Ontology_Navigator.py', 'name': 'Ontology Navigator', 'image': './data/plots/page3.jpg',
+    2: {'file': './2_Ontology_Navigator.py', 'name': 'Ontologies', 'image': './data/plots/page3.jpg',
         'description': 'Explore the ontologies in the VAE latent space.'},
     
-    4: {'file': './4_Data.py', 'name': 'Data Navigator', 'image': './data/plots/page4.jpg', 
+    4: {'file': './4_Data.py', 'name': 'Data', 'image': './data/plots/page4.jpg', 
         'description': 'Explore the data.'},
 }
 
@@ -1129,7 +1129,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )
-        fig.update_traces(marker=dict(size=point_size, opacity=point_opacity))
+        fig.update_traces(marker=dict(size=point_size, opacity=point_opacity),)
     else:
         fig = px.scatter(
             DATA,

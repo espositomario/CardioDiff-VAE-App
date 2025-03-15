@@ -2,24 +2,27 @@
 path = "0_Home.py"
 name = "Home"
 
+
+
 [[pages]]
 path = "1_Latent_Space.py"
-name = "Genome Navigator"
+name = "Genome"
 icon = ":material/scatter_plot:"
 
 [[pages]]
-path = "2_Clusters_Navigator.py"
-name = "Cluster Navigator"
-icon = ":material/explore:"
-
-[[pages]]
-path = "3_Ontology_Navigator.py"
-name = "Ontology Navigator"
+path = "2_Ontology_Navigator.py"
+name = "Ontologies"
 icon = ":material/menu_book:"
 
 [[pages]]
+path = "3_Clusters_Navigator.py"
+name = "Clusters"
+icon = ":material/explore:"
+
+
+[[pages]]
 path = "4_Data.py"
-name = "Data Navigator"
+name = "Data"
 icon = ":material/table_rows:"
 
 [[pages]]

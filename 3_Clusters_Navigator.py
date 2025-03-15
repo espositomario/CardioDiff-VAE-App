@@ -22,7 +22,7 @@ HELP_DICT = {
             among clusters, set to the maximum y-value among all clusters for each HM and CT combination.\
                 \n-  averaged ChIP-seq metaplots centered on the Transcription Start Site (TSS)\
                 were generated independently for each HM (and control) across all CTs, using SeqCode\
-                \(produceTSSplots). A single replicate BAM file was used for each HM/CT combination. The\
+                (produceTSSplots). A single replicate BAM file was used for each HM/CT combination. The\
                 fragment length was set to 250 bp, with a sliding window of 50 bp, covering a region from -\
                 2500 to +2500 bp relative to the TSS. Signal profiles were smoothed using a moving rolling\
                 mean with a window size of 200 bp. To make the plots scales as much comparable as possible\

@@ -1041,7 +1041,8 @@ def download_genes_list(GENE_LIST, k=None, key=None, filename=None):
     )
     
     
-    
+
+
 def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_index=0,
             LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12, DEF_POINT_ALPHA=0.9, SEL_POINT_ALPHA=0.9):
     
@@ -1080,6 +1081,23 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                     value=(min_val, max_val), key=key + 'range_slider'
                 )
 
+    else:
+        with C[1]:
+            with st.popover("", icon=":material/filter_list:"):
+                categories = sorted(DATA[selected_feature].unique().tolist())
+                selected_categories = st.multiselect(
+                    f"Select categories to color for {selected_feature}",
+                    options=categories,
+                    default=categories,  # Select all by default
+                    key=key + 'cat_filter'
+                )
+                # Update color_dict based on selection
+                color_dict = {
+                    cat: color_dict.get(cat, "grey") if cat in selected_categories else "#E7E7E7"
+                    for cat in color_dict
+                }
+                
+                
     with C[2]:
         with st.popover("", icon=":material/settings:"):
             point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key + 'point_size')
@@ -1204,7 +1222,6 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         plotly_download_png(fig, file_name=f"VAE_LatentSpace_{DR}_{selected_feature}")
     
     return fig
-
 
 
 def get_gene_ncbi_page(NCBI_IDs):

@@ -14,7 +14,7 @@ for i in range(4):
 st.divider()
 #---------------------------------#
 def page_description(PAGES_DICT, i):
-    cols = st.columns([3,1], gap='large', vertical_alignment='center')
+    cols = st.columns([2,1], gap='large', vertical_alignment='center')
     with cols[0]:    
         st.markdown(f"<h3 style='text-align: center;'>{PAGES_DICT[i]['name']}</h3>", unsafe_allow_html=True)
 

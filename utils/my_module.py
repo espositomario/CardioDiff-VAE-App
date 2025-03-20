@@ -1081,6 +1081,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         color_dict = COLOR_DICTS.get(selected_feature, None)
 
         if color_dict is None:
+
             categories = DATA[selected_feature].unique()
             num_categories = len(categories)
 
@@ -1114,13 +1115,12 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                 # Replace unselected values with 'Other'
                 modified_data = DATA.copy()
                 modified_data[selected_feature] = modified_data[selected_feature].apply(
-                    lambda x: x if x in selected_categories else 'other'
-                )
+                    lambda x: x if x in selected_categories else 'other')
                 
-                # Update color_dict to include 'Other'
+                # Update color_dict to include 'other'
                 color_dict['other'] = "#E7E7E7" # Set color for 'Other'
-            
-                
+
+
     with C[2]:
         with st.popover("", icon=":material/settings:"):
             point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key + 'point_size')
@@ -1170,7 +1170,20 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )
-        fig.update_traces(marker=dict(size=point_size, opacity=point_opacity),)
+
+        fig.update_traces(marker=dict(size=point_size, opacity=point_opacity),)    
+        fig.update_layout(legend=dict(
+                itemsizing='constant',
+                tracegroupgap=0,
+                traceorder='normal',
+                font=dict(
+                    size=12,
+                    color="black"
+                ),
+            ),
+            )
+    
+    
     else:
         fig = px.scatter(
             DATA,
@@ -1187,8 +1200,8 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         fig.update_traces(
             marker=dict(
                 size=point_size,
-                opacity=np.where(mask, 0.1, point_opacity)
-            )
+                opacity=np.where(mask, 0.1, point_opacity),
+            ),
         )
 
     # Highlight selected genes (modified)

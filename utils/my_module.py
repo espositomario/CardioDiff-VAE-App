@@ -17,6 +17,9 @@ from plotly.subplots import make_subplots
 import plotly.colors as pc
 import colorsys
 
+import fitz  # PyMuPDF
+from PIL import Image
+
 import math
 from matplotlib import cm, colors as mcolors
 from matplotlib.backends.backend_pdf import PdfPages
@@ -992,11 +995,7 @@ def title_with_help(TITLE, help_text, help_width=0.1):
         with st.popover("", icon=':material/help:'):  # Usa st.popover
             st.write(help_text)
             
-            
-            
-import fitz  # PyMuPDF
-import io
-from PIL import Image
+
 
 def convert_pdf_to_image(pdf_path, dpi=600):  # Add dpi argument with default value
     try:

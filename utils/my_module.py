@@ -1043,6 +1043,24 @@ def download_genes_list(GENE_LIST, k=None, key=None, filename=None):
     
 
 
+
+def get_gene_ncbi_page(NCBI_IDs):
+    with st.popover("NCBI Gene Info"):
+        GENE = st.selectbox("Get a link to the NCBI Gene entry", 
+                                options=[""] + list(DATA.index),  # Empty string for no default selection
+                                format_func=lambda x: "Type a gene symbol..." if x == "" else x,
+                                help='Refseq Gene Symbol in Mouse',)
+        if GENE:
+            
+            NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
+            if NCBI_ID == 0:
+                #st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
+                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D)",
+                            unsafe_allow_html=True)
+            else:
+                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/{NCBI_ID})", unsafe_allow_html=True)
+
+
 def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_index=0,
             LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12, DEF_POINT_ALPHA=0.9, SEL_POINT_ALPHA=0.9):
     
@@ -1091,12 +1109,17 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                     default=categories,  # Select all by default
                     key=key + 'cat_filter'
                 )
-                # Update color_dict based on selection
-                color_dict = {
-                    cat: color_dict.get(cat, "grey") if cat in selected_categories else "#E7E7E7"
-                    for cat in color_dict
-                }
                 
+                
+                # Replace unselected values with 'Other'
+                modified_data = DATA.copy()
+                modified_data[selected_feature] = modified_data[selected_feature].apply(
+                    lambda x: x if x in selected_categories else 'other'
+                )
+                
+                # Update color_dict to include 'Other'
+                color_dict['other'] = "#E7E7E7" # Set color for 'Other'
+            
                 
     with C[2]:
         with st.popover("", icon=":material/settings:"):
@@ -1138,7 +1161,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
 
     if CAT:
         fig = px.scatter(
-            DATA,
+            modified_data,
             x=COMPONENTS[0],  # Use dynamic component names
             y=COMPONENTS[1],
             color=selected_feature,
@@ -1222,20 +1245,3 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         plotly_download_png(fig, file_name=f"VAE_LatentSpace_{DR}_{selected_feature}")
     
     return fig
-
-
-def get_gene_ncbi_page(NCBI_IDs):
-    with st.popover("NCBI Gene Info"):
-        GENE = st.selectbox("Get a link to the NCBI Gene entry", 
-                                options=[""] + list(DATA.index),  # Empty string for no default selection
-                                format_func=lambda x: "Type a gene symbol..." if x == "" else x,
-                                help='Refseq Gene Symbol in Mouse',)
-        if GENE:
-            
-            NCBI_ID = NCBI_IDs.loc[GENE]['NCBI GeneID']
-            if NCBI_ID == 0:
-                #st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term={GENE})", unsafe_allow_html=True)
-                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/?term=(Mus+musculus%5BOrganism%5D)+AND+{GENE}%5BGene+Name%5D)",
-                            unsafe_allow_html=True)
-            else:
-                st.markdown(f"[NCBI link](https://www.ncbi.nlm.nih.gov/gene/{NCBI_ID})", unsafe_allow_html=True)

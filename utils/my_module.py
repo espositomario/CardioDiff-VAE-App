@@ -83,13 +83,14 @@ CT_COL_DICT= {'ESC': '#405074',
                 'CP': '#c36171',
                 'CM': '#eea98d',}
 
-CV_COL_DICT= {'RNA_ESC': '#405074',
+CV_COL_DICT= {'other':'#ECECEC',
+                'RNA_ESC': '#405074',
                 'RNA_MES': '#7d5185',
                 'RNA_CP': '#c36171',
                 'RNA_CM': '#eea98d',
                 'STABLE':'#B4CD70',
-                'other':'#ECECEC'}
-GONZALEZ_COL_DICT= {'Active': '#E5AA44','Bivalent': '#7442BE','other':'#ECECEC'}
+                }
+GONZALEZ_COL_DICT= {'other':'#ECECEC','Active': '#E5AA44','Bivalent': '#7442BE'}
 
 COLOR_DICTS = {
     "CV_Category": CV_COL_DICT,
@@ -1261,7 +1262,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
 
 
 def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_index=0,
-            LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12, DEF_POINT_ALPHA=0.9, SEL_POINT_ALPHA=0.9):
+            LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12, DEF_POINT_ALPHA=0.8, SEL_POINT_ALPHA=0.9):
     
     COMPONENTS = [col for col in DATA.columns if f'{DR}' in col]
     # Layout for control elements
@@ -1312,7 +1313,20 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                 
                 
                 # Replace unselected values with 'Other'
+                # sort modfiied data accordint to color_dict.keys() if modified_data[selected_feature] is not integer
+                                
                 modified_data = DATA.copy()
+                
+                if selected_feature != 'Cluster':
+                    sort_order = list(color_dict.keys())  # Use color_dict keys for sorting
+                    modified_data[selected_feature] = pd.Categorical(
+                        modified_data[selected_feature], categories=sort_order, ordered=True
+                    )
+                    modified_data = modified_data.sort_values(by=selected_feature)
+                else:
+                    modified_data = modified_data.sort_values(by=selected_feature)
+                    
+
                 modified_data[selected_feature] = modified_data[selected_feature].apply(
                     lambda x: x if x in selected_categories else 'other')
 
@@ -1320,20 +1334,10 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                 # Update color_dict to include 'other'
                 color_dict['other'] = "#E7E7E7" # Set color for 'Other'
                 
-                ## Sorting modified data
-                #sort_order = sorted(modified_data[selected_feature].unique().tolist())
-                #print(sort_order)
-                #print(selected_categories)
-                #print(color_dict.keys())
-                ##sort_order = selected_categories + ['other']  # Desired sort order
-                #modified_data[selected_feature] = pd.Categorical(
-                #    modified_data[selected_feature], categories=sort_order, ordered=True
-                #)
-                ##modified_data = modified_data.sort_values(by=selected_feature)
 
     with C[2]:
         with st.popover("", icon=":material/settings:"):
-            point_size = st.slider("Point Size", min_value=1, max_value=14, value=5, step=1, key=key + 'point_size')
+            point_size = st.slider("Point Size", min_value=1, max_value=14, value=4, step=1, key=key + 'point_size')
             point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=DEF_POINT_ALPHA, step=0.1, key=key + 'point_opacity')
             if not CAT:
                 colormap = st.segmented_control(
@@ -1376,7 +1380,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
             y=COMPONENTS[1],
             color=selected_feature,
             color_discrete_map=color_dict,
-            hover_data=[DATA.index, "Cluster", selected_feature],
+            hover_data=[modified_data.index, "Cluster", selected_feature],
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )

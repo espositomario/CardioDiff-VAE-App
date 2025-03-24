@@ -1333,7 +1333,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
 
     with C[2]:
         with st.popover("", icon=":material/settings:"):
-            point_size = st.slider("Point Size", min_value=1, max_value=8, value=3, step=1, key=key + 'point_size')
+            point_size = st.slider("Point Size", min_value=1, max_value=14, value=5, step=1, key=key + 'point_size')
             point_opacity = st.slider("Transparency", min_value=0.1, max_value=1.0, value=DEF_POINT_ALPHA, step=0.1, key=key + 'point_opacity')
             if not CAT:
                 colormap = st.segmented_control(
@@ -1461,7 +1461,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
         yaxis=dict(showgrid=False, zeroline=False,   tickvals=[]),
         plot_bgcolor="white",
         autosize=False,
-        showlegend=True
+        #showlegend=True
     )
 
     with C[3]:

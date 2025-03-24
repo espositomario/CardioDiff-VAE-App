@@ -67,7 +67,7 @@ if SEL_DB:
         with C[0]:    
             KEY1 = 'key1'
             
-            fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=1, 
+            fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=23, 
                             LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
             st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
@@ -77,7 +77,7 @@ if SEL_DB:
             KEY2 = 'key2'
             # Dropdown for feature selection
 
-            fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=2,
+            fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=24,
                             LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
             st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
             

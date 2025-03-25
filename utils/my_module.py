@@ -1181,7 +1181,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
             y=COMPONENTS[1],
             color=selected_feature,
             color_discrete_map=color_dict,
-            hover_data=[modified_data.index, "Cluster", selected_feature],
+            hover_data=[modified_data.index,  selected_feature],
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )
@@ -1207,7 +1207,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
             color=DATA[selected_feature],
             color_continuous_scale=colormap,
             range_color=[min_p, max_p],
-            hover_data=[DATA.index, "Cluster", selected_feature],
+            hover_data=[DATA.index,  selected_feature],
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )

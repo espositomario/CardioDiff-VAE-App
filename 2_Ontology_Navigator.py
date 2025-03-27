@@ -1,6 +1,9 @@
 from utils.my_module import *
 
-st.markdown("<h1 style='text-align: center;'>Terms in the VAE Latent Space</h1>", unsafe_allow_html=True)
+page_index=2
+st.markdown(f"<h1 style='text-align: center;'>{PAGES_DICT[page_index]['name']}</h1>", unsafe_allow_html=True)
+st.markdown(PAGES_DICT[page_index]['description'])
+st.divider()
 
 
 C = st.columns(2, gap='medium', vertical_alignment='top')
@@ -41,7 +44,6 @@ if SEL_DB:
 
 
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.markdown(f"<h3 style='text-align: center;'>{SEL_GENE_SET} genes highligthed in the VAE latent space projection</h3>", unsafe_allow_html=True)   
 
         
         #
@@ -55,7 +57,7 @@ if SEL_DB:
 
                 SEL_GENES_SIZE = st.slider("Point size", min_value=6, max_value=24, value=10, step=2)
                 
-                SEL_POINT_ALPHA = st.slider("Point transparency", min_value=0.1, max_value=1.0, value=0.7, step=0.1)
+                SEL_POINT_ALPHA = st.slider("Point transparency", min_value=0.1, max_value=1.0, value=0.8, step=0.1)
 
                 if SHOW_LABELS: LABEL_SIZE = st.slider("Label size", min_value=8, max_value=20, value=10, step=2)
                 else: LABEL_SIZE = None
@@ -68,7 +70,7 @@ if SEL_DB:
             KEY1 = 'key1'
             
             fig1 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key=KEY1+'popover', COLOR_DICTS=COLOR_DICTS, default_index=23, 
-                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
+                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.5, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
             st.plotly_chart(fig1, use_container_width=True,key=KEY1+'fig')
 
 
@@ -78,11 +80,12 @@ if SEL_DB:
             # Dropdown for feature selection
 
             fig2 = scatter(DATA, COLOR_FEATURES, SEL_GENES=GENE_LIST, DR=DR, key = KEY2+'popover',COLOR_DICTS=COLOR_DICTS, default_index=24,
-                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.3, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
+                            LABELS= SHOW_LABELS, SEL_GENES_SIZE=SEL_GENES_SIZE, LABEL_SIZE=LABEL_SIZE, DEF_POINT_ALPHA=0.5, SEL_POINT_ALPHA=SEL_POINT_ALPHA)
             st.plotly_chart(fig2, use_container_width=True,key=KEY2+'fig')
             
 
-    
+st.markdown(f"<h3 style='text-align: center;'>{SEL_GENE_SET} genes highligthed in the VAE latent space projection</h3>", unsafe_allow_html=True)   
+
 
 
 

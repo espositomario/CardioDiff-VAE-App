@@ -1,6 +1,9 @@
 from utils.my_module import *
 
-
+page_index=4
+st.markdown(f"<h1 style='text-align: center;'>{PAGES_DICT[page_index]['name']}</h1>", unsafe_allow_html=True)
+st.markdown(PAGES_DICT[page_index]['description'])
+st.divider()
 
 
 with st.sidebar:
@@ -88,7 +91,7 @@ if SEL_GENES:
     plotly_download_pdf(fig, file_name=f"SelectedGenes_GeneTrends.pdf")
 #-------------------Filter data by features (columns)-------------------#
 st.divider()
-st.markdown("<h2 style='text-align: center;'>Filter data by features</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>Filter genes by features</h2>", unsafe_allow_html=True)
 #with st.expander("Select Features to display"):
 df_tabs(DATA)
 

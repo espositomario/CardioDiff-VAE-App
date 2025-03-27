@@ -43,7 +43,7 @@ PAGES_DICT = {
     1: {'file': './1_Latent_Space.py', 'name': 'Gene search', 'image': './data/plots/page1.jpg', 
         'description': """Visualize genes in a 6-dimensional VAE latent space using UMAP/PCA projections.
         Each point represents a gene, displayed in an interactive scatterplot.
-        Users can color points based on input features or external annotations and highlight specific genes to observe their distribution.
+        Points(genes) can be colored based on input features or external annotations and highlight specific genes to observe their distribution.
         Input features include both epigenetic and gene expression data from cardiac differentiation."""},
     
     3: {'file': './3_Clusters_Navigator.py', 'name': 'Clusters', 'image': './data/plots/page2.jpg',
@@ -57,10 +57,10 @@ Tree maps of cluster composition based on overlap with external annotation sourc
     2: {'file': './2_Ontology_Navigator.py', 'name': 'Term search', 'image': './data/plots/page3.jpg',
         'description': """Visualize genes in a 6-dimensional VAE latent space using UMAP/PCA projections. 
         Each point represents a gene, displayed in an interactive scatterplot. 
-        Users can highlight genes annotated with specific terms from any EnrichR library, in addition to coloring by input features or external annotations."""},
+        Points(genes) can be colored annotated with specific terms from any EnrichR library, in addition to coloring by input features or external annotations."""},
     
     4: {'file': './4_Data.py', 'name': 'Data', 'image': './data/plots/page4.jpg', 
-        'description': """Filter and Download Data: Allows users to filter data by gene symbols for visualization, or by multiple columns/feature conditions (ranges/values)."""},
+        'description': """Filter and Download Data. Filter data by gene symbols for visualization, or select genes by multiple columns/feature conditions (ranges/values)."""},
 }
 
 ABOUT_DICT = {
@@ -271,7 +271,6 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     },
     #hide_index=True,
     )
-
     return df
 
 def df_tabs(DF):

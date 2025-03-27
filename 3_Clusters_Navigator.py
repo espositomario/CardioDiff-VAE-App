@@ -1,7 +1,9 @@
 from utils.my_module import *
 
-#st.set_page_config(layout="wide", initial_sidebar_state="expanded", 
-#                    page_icon=":material/search:",)
+page_index=3
+st.markdown(f"<h1 style='text-align: center;'>{PAGES_DICT[page_index]['name']}</h1>", unsafe_allow_html=True)
+st.markdown(PAGES_DICT[page_index]['description'])
+st.divider()
 
 HELP_DICT = {
     "Cluster categories Map": "- On the LEFT: Tree maps depicting the percentage of genes in each cluster defined as most variable\
@@ -114,11 +116,6 @@ with st.sidebar:
     st.button(st.session_state.expand_states['label'], icon=st.session_state.expand_states['icon'], on_click=expand_callback, key="expand_button")
 
 
-
-# --------------------------------------------------------------
-
-st.markdown("<h1 style='text-align: center;'>Cluster Navigator</h1>", unsafe_allow_html=True,)
-st.markdown("<h5 style='text-align: center;'>Explore genes in each cluster in term of input features distributions, Metagene plots...</h5>", unsafe_allow_html=True,)
 
 #-------------------Clusters composition-------------------#
 with st.expander("Cluster categories Map",  icon=":material/stacked_bar_chart:",expanded=st.session_state.expand_states['bool']):

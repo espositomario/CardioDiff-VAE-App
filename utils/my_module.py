@@ -41,16 +41,26 @@ APP_NAME= 'CardioDiff-VAE'
 
 PAGES_DICT = {
     1: {'file': './1_Latent_Space.py', 'name': 'Gene search', 'image': './data/plots/page1.jpg', 
-        'description': 'Explore the genome in the VAE latent space.'},
+        'description': """Visualize genes in a 6-dimensional VAE latent space using UMAP/PCA projections.
+        Each point represents a gene, displayed in an interactive scatterplot.
+        Users can color points based on input features or external annotations and highlight specific genes to observe their distribution.
+        Input features include both epigenetic and gene expression data from cardiac differentiation."""},
     
     3: {'file': './3_Clusters_Navigator.py', 'name': 'Clusters', 'image': './data/plots/page2.jpg',
-        'description': 'Explore the clusters in the VAE latent space.'},
+        'description': 
+"""Enables exploration of gene clusters identified within the VAE latent space. For each cluster, it provides:
+Boxplots of feature distributions and ChIP-seq metaplots centered around the TSS; 
+Term enrichment analysis; 
+Visualization of gene expression dynamics across cardiac differentiation;
+Tree maps of cluster composition based on overlap with external annotation sources."""},
     
     2: {'file': './2_Ontology_Navigator.py', 'name': 'Term search', 'image': './data/plots/page3.jpg',
-        'description': 'Explore the ontologies in the VAE latent space.'},
+        'description': """Visualize genes in a 6-dimensional VAE latent space using UMAP/PCA projections. 
+        Each point represents a gene, displayed in an interactive scatterplot. 
+        Users can highlight genes annotated with specific terms from any EnrichR library, in addition to coloring by input features or external annotations."""},
     
     4: {'file': './4_Data.py', 'name': 'Data', 'image': './data/plots/page4.jpg', 
-        'description': 'Explore the data.'},
+        'description': """Filter and Download Data: Allows users to filter data by gene symbols for visualization, or by multiple columns/feature conditions (ranges/values)."""},
 }
 
 ABOUT_DICT = {

@@ -92,33 +92,6 @@ st.markdown("<h2 style='text-align: center;'>Filter data by features</h2>", unsa
 #with st.expander("Select Features to display"):
 df_tabs(DATA)
 
-st.markdown("<h2 style='text-align: center;'>Data tables description</h3>", unsafe_allow_html=True)
 
-#-------------------Data tables description-------------------#
-DESCRIPTION= """
-- #### **Features Z-scores Table**  
-   Displays Z-scores for RNA expression and histone modifications (`H3K4me3`, `H3K27ac`, `H3K27me3`) across cell types. For simplicity the average value across replicates is shown.
-   - **Format**: `{Experiment}_{CellType}` (e.g., `RNA_ESC`, `H3K4me3_MES`).  
-
-- #### **RNA LogFCs Table**  
-   Contains log fold change values comparing RNA expression between cell types. LogFC measures relative expression differences.  
-   - **Format**: `RNA_{CellType1}_{CellType2}_FC` (e.g., `RNA_CM_CP_FC`: Log fold change of gene expression between cardiac mesoderm and cardiac progenitor cells.)
-
-- #### **Gene Annotations Table**  
-     - `Cluster`: Gene cluster assignment.  
-     - `RNA_CV`: Coefficient of variation for RNA expression.  
-     - `CV_Category`: Category based on RNA variability.  
-     - `ESC_ChromState_Gonzalez2021`: Chromatin state in embryonic stem cells based on the Gonzalez 2021 dataset.  
-     - `VAE_RMSE`: Reconstruction error from the VAE model.  
-     - `VAE_Sc`: A score derived from the VAE model.
-
-- #### **VAE Latent Space Table**  
-   Represents compressed gene features from Variational Autoencoder (VAE). Includes latent variables (`VAE1`-`VAE6`), UMAP projections (`VAE_UMAP1`, `VAE_UMAP2`), and PCA components (`VAE_PCA1`, `VAE_PCA2`).  
-
-- #### **RNA-seq FPKMs Table**  
-   Contains FPKM values for RNA expression across cell types and replicates. FPKM normalizes expression by transcript length and sequencing depth.  
-   - **Format**: `RNA_{CellType}_{Replicate}` (e.g., `RNA_ESC_1`).   """
-   
-st.markdown(DESCRIPTION, unsafe_allow_html=True)
 
 add_footer()

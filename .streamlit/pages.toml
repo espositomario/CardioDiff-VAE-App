@@ -6,12 +6,12 @@ name = "Home"
 
 [[pages]]
 path = "1_Latent_Space.py"
-name = "Genome"
+name = "Gene search"
 icon = ":material/scatter_plot:"
 
 [[pages]]
 path = "2_Ontology_Navigator.py"
-name = "Ontologies"
+name = "Term search"
 icon = ":material/menu_book:"
 
 [[pages]]

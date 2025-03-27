@@ -40,13 +40,13 @@ APP_NAME= 'CardioDiff-VAE'
 
 
 PAGES_DICT = {
-    1: {'file': './1_Latent_Space.py', 'name': 'Genome', 'image': './data/plots/page1.jpg', 
+    1: {'file': './1_Latent_Space.py', 'name': 'Gene search', 'image': './data/plots/page1.jpg', 
         'description': 'Explore the genome in the VAE latent space.'},
     
     3: {'file': './3_Clusters_Navigator.py', 'name': 'Clusters', 'image': './data/plots/page2.jpg',
         'description': 'Explore the clusters in the VAE latent space.'},
     
-    2: {'file': './2_Ontology_Navigator.py', 'name': 'Ontologies', 'image': './data/plots/page3.jpg',
+    2: {'file': './2_Ontology_Navigator.py', 'name': 'Term search', 'image': './data/plots/page3.jpg',
         'description': 'Explore the ontologies in the VAE latent space.'},
     
     4: {'file': './4_Data.py', 'name': 'Data', 'image': './data/plots/page4.jpg', 
@@ -333,8 +333,9 @@ Z_AVG_features = ['RNA_ESC', 'RNA_MES', 'RNA_CP', 'RNA_CM', 'H3K4me3_ESC', 'H3K4
         'H3K4me3_CP', 'H3K4me3_CM', 'H3K27ac_ESC', 'H3K27ac_MES', 'H3K27ac_CP',
         'H3K27ac_CM', 'H3K27me3_ESC', 'H3K27me3_MES', 'H3K27me3_CP',
         'H3K27me3_CM']
-LOG_FC_features = ['RNA_CM_CP_FC', 'RNA_CM_MES_FC', 'RNA_CM_ESC_FC',
-            'RNA_CP_MES_FC', 'RNA_CP_ESC_FC', 'RNA_MES_ESC_FC']
+
+
+LOG_FC_features = ['RNA_MES_ESC_FC', 'RNA_CP_ESC_FC','RNA_CM_ESC_FC','RNA_CP_MES_FC','RNA_CM_MES_FC', 'RNA_CM_CP_FC', ]
 
 MISC_features = [ 'Cluster','RNA_CV', 'CV_Category', 'ESC_ChromState_Gonzalez2021', 'VAE_RMSE', 'VAE_Sc']
 

@@ -1,6 +1,6 @@
 from utils.my_module import *
 
-st.markdown("<h1 style='text-align: center;'>Ontologies in the VAE Latent Space</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Terms in the VAE Latent Space</h1>", unsafe_allow_html=True)
 
 
 C = st.columns(2, gap='medium', vertical_alignment='top')
@@ -8,20 +8,20 @@ C = st.columns(2, gap='medium', vertical_alignment='top')
 
 DB_LIST = sorted(gp.get_library_name(organism='Mouse'), key=str.lower)
 with C[0]:
-    SEL_DB = st.selectbox("Database:", DB_LIST,index=DB_LIST.index('WikiPathways_2024_Mouse'), 
+    SEL_DB = st.selectbox("Library:", DB_LIST,index=DB_LIST.index('WikiPathways_2024_Mouse'), 
                             help='Enrichr API by gseapy python library',
-                            placeholder="Select or Type a database")
+                            placeholder="Select or Type...")
 
 if SEL_DB:
-    with st.spinner(f"Loading gene sets from **{SEL_DB}**..."):
+    with st.spinner(f"Loading terms from **{SEL_DB}**..."):
         DB = gp.get_library(name=SEL_DB, organism='Mouse')
     
     GENE_SETS = sorted(list(DB.keys()), key=str.lower)
     with C[1]:
         # Step 3: Multiselect for gene sets
-        SEL_GENE_SET = st.selectbox("Gene Set:", GENE_SETS, 
+        SEL_GENE_SET = st.selectbox("Term:", GENE_SETS, 
                                     index= GENE_SETS.index('Heart Development WP2067') if SEL_DB == 'WikiPathways_2024_Mouse'  else None,
-                                    placeholder="Select or Type a gene set")
+                                    placeholder="Select or Type...")
 
 
     if SEL_GENE_SET:

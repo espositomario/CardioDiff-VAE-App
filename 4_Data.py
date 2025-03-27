@@ -78,8 +78,14 @@ if SEL_GENES:
     st.markdown("<h3 style='text-align: center;'>Gene to Cluster Sankey Diagram</h3>", unsafe_allow_html=True)
     fig = plot_sankey(DATA, SEL_GENES, font_color="white", font_size=14, link_opacity=0.5)
     st.plotly_chart(fig, use_container_width=True)
+    plotly_download_pdf(fig, file_name=f"SelectedGenes_Sankey.pdf")
 
-
+    # PLot expression gene pattern
+    FPKM = DATA.filter(FPKM_features)
+    fig = plot_gene_trend(np.log2(FPKM+1), SEL_GENES, CT_LIST, CT_COL_DICT, Y_LAB="log2(FPKM+1)")
+    st.plotly_chart(fig, use_container_width=True)
+    
+    plotly_download_pdf(fig, file_name=f"SelectedGenes_GeneTrends.pdf")
 #-------------------Filter data by features (columns)-------------------#
 st.divider()
 st.markdown("<h2 style='text-align: center;'>Filter data by features</h2>", unsafe_allow_html=True)

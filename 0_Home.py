@@ -31,10 +31,5 @@ for i in range(4):
 
 
 
-
-
-
-
-
     
 add_footer()

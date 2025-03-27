@@ -83,14 +83,14 @@ CT_COL_DICT= {'ESC': '#405074',
                 'CP': '#c36171',
                 'CM': '#eea98d',}
 
-CV_COL_DICT= {'other':'#ECECEC',
+CV_COL_DICT= {'Other':'#ECECEC',
                 'RNA_ESC': '#405074',
                 'RNA_MES': '#7d5185',
                 'RNA_CP': '#c36171',
                 'RNA_CM': '#eea98d',
                 'STABLE':'#B4CD70',
                 }
-GONZALEZ_COL_DICT= {'other':'#ECECEC','Active': '#E5AA44','Bivalent': '#7442BE'}
+GONZALEZ_COL_DICT= {'Other':'#ECECEC','Active': '#E5AA44','Bivalent': '#7442BE'}
 
 COLOR_DICTS = {
     "CV_Category": CV_COL_DICT,
@@ -1130,11 +1130,11 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                     
 
                 modified_data[selected_feature] = modified_data[selected_feature].apply(
-                    lambda x: x if x in selected_categories else 'other')
+                    lambda x: x if x in selected_categories else 'Other')
 
 
-                # Update color_dict to include 'other'
-                color_dict['other'] = "#E7E7E7" # Set color for 'Other'
+                # Update color_dict to include 'Other'
+                color_dict['Other'] = "#E7E7E7" # Set color for 'Other'
                 
 
     with C[2]:

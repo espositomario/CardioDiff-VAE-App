@@ -1072,6 +1072,7 @@ def get_gene_ncbi_page(NCBI_IDs):
 
 
 
+
 def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_index=0,
             LABELS=True, SEL_GENES_SIZE=16, LABEL_SIZE=12, DEF_POINT_ALPHA=0.8, SEL_POINT_ALPHA=0.9):
     
@@ -1130,15 +1131,15 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
                 
                 if selected_feature != 'Cluster':
                     sort_order = list(color_dict.keys())  # Use color_dict keys for sorting
-                    modified_data[selected_feature] = pd.Categorical(
-                        modified_data[selected_feature], categories=sort_order, ordered=True
+                    DATA[selected_feature] = pd.Categorical(
+                        DATA[selected_feature], categories=sort_order, ordered=True
                     )
-                    modified_data = modified_data.sort_values(by=selected_feature)
+                    DATA = DATA.sort_values(by=selected_feature)
                 else:
-                    modified_data = modified_data.sort_values(by=selected_feature)
+                    DATA = DATA.sort_values(by=selected_feature)
                     
 
-                modified_data[selected_feature] = modified_data[selected_feature].apply(
+                DATA[selected_feature] = DATA[selected_feature].apply(
                     lambda x: x if x in selected_categories else 'Other')
 
 
@@ -1163,7 +1164,7 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
     # Precompute colors for all points
     if CAT:
         # Categorical coloring
-        colors = modified_data[selected_feature].map(
+        colors = DATA[selected_feature].map(
             lambda val: color_dict[val] if color_dict and val in color_dict else "gray"
         ).tolist()
     else:
@@ -1186,12 +1187,12 @@ def scatter(DATA, COLOR_FEATURES, SEL_GENES, DR, key, COLOR_DICTS=None, default_
 
     if CAT:
         fig = px.scatter(
-            modified_data,
+            DATA,
             x=COMPONENTS[0],  # Use dynamic component names
             y=COMPONENTS[1],
             color=selected_feature,
             color_discrete_map=color_dict,
-            hover_data=[modified_data.index,  selected_feature],
+            hover_data=[DATA.index,  selected_feature],
             title=f"{selected_feature}",
             labels={COMPONENTS[0]: COMPONENTS[0].replace("VAE_", ""), COMPONENTS[1]: COMPONENTS[1].replace("VAE_", "")}, # Dynamic labels
         )
